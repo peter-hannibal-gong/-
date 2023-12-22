@@ -121,6 +121,36 @@ bool HelloWorld::init()
     //spriteGcn->setPosition(200, 170);//将精灵放在100,100的位置
 
 
+
+    auto spritecache = SpriteFrameCache::getInstance();
+    spritecache->addSpriteFramesWithFile("monster.plist");   //将图集放入缓存中
+    spritecache->addSpriteFramesWithFile("object.plist");
+
+    auto Monster01 = Sprite::createWithSpriteFrameName("Monster01.png");
+    this->addChild(Monster01, 0);
+    Monster01->setPosition(750, 750);   //通过缓存创建精灵
+
+    auto move1 = MoveTo::create(2, Vec2(1170, 750));
+    Monster01->runAction(move1);
+
+    auto Object07 = Sprite::createWithSpriteFrameName("Object07.png");
+    this->addChild(Object07, 0);
+    Object07->setPosition(550, 750);   //通过缓存创建精灵
+
+
+
+    //auto moveTo = MoveTo::create(2,Vec2(200,0));
+    //sprite_carrot->runAction(moveTo);         //在2秒内移动到(200,0)这个位置
+
+    //auto moveBy = MoveBy::create(2,Vec2(500,0));   //在2秒内向右移动500像素
+    //sprite_carrot->runAction(moveBy);
+
+
+
+    //auto spriteGcn= Sprite::create("grossini.png"); //创造精灵
+    //this->addChild(spriteGcn, 0);  //将精灵加入到这个世界中
+    //spriteGcn->setPosition(200, 170);//将精灵放在100,100的位置 
+
     return true;
 }
 
