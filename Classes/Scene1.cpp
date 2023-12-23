@@ -56,6 +56,21 @@ bool Scene1::init()
         this->addChild(map01, 0);
     }
 
+    // 添加怪物木牌
+    auto Board = Sprite::create("Board.png");
+    if (Board == nullptr)
+    {
+        problemLoading("'Board.png'");
+    }
+    else
+    {
+        // position the sprite on the center of the screen
+        Board->setPosition(Vec2(visibleSize.width / 12*2-40 + origin.x, visibleSize.height /7*5+20 + origin.y));
+
+        // add the sprite as a child to this layer
+        this->addChild(Board, 0);
+    }
+
     //触摸格点显示格子
     Sprite* grid[7][12];
     for (int i = 0; i < 7; i++) {
@@ -74,12 +89,14 @@ bool Scene1::init()
         }
     }
 
-    auto mouseListener = EventListenerMouse::create();
+    if (f) {
+        auto mouseListener = EventListenerMouse::create();
 
-    mouseListener->onMouseDown = CC_CALLBACK_1(Scene1::onMouseDown, this);
+        mouseListener->onMouseDown = CC_CALLBACK_1(Scene1::onMouseDown, this);
 
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
-
+        _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+    }
+    f = 1;
     return true;
 }
 
@@ -157,6 +174,7 @@ void Scene1::onMouseDown(Event* event)
     Tower2->setPosition(Vec2(x1 + Tower2->getContentSize().width / 2, y1 + Tower2->getContentSize().height));
     Buy_Layer->addChild(Tower2, 2);
 
+    //将layer加入场景中
     this->addChild(Buy_Layer);
 
     //监听器，是否购买炮塔
@@ -166,6 +184,7 @@ void Scene1::onMouseDown(Event* event)
         return true;
     };
     listener->onTouchEnded = [this, Grid_Selcted, Tower1, Tower2,p,Buy_Layer,x1,y1](Touch* touch, Event* event) {
+        f = 0;
         //若按下位置在第一个炮塔图标内
         if (touch->getLocation().x >= Tower1->getPosition().x - Tower1->getContentSize().width / 2 &&
             touch->getLocation().x <= Tower1->getPosition().x + Tower1->getContentSize().width / 2 &&
@@ -186,11 +205,19 @@ void Scene1::onMouseDown(Event* event)
                 //地图上该点为炮塔
                 Map1[p.i][p.j] = TOWER;
 
-                auto Bottle_Tower = Sprite::create("Theme/Bottle/BigBottle.png");
+                //建造瓶子炮塔
+                auto Bottle_Tower = Sprite::create("Theme/Bottle/SmallBottle.png");                
                 Bottle_Tower->setPosition(Vec2(x1, y1));
+                Bottle_Tower->setTag(x1 * 1000 + y1*10);
                 this->addChild(Bottle_Tower);
 
             }
+            else {  //钱不够
+                //去除购买炮塔的图标
+                this->removeChild(Buy_Layer);
+
+            }
+
         }
         else if (//若按下位置在第二个炮塔图标内
             touch->getLocation().x >= Tower2->getPosition().x - Tower2->getContentSize().width / 2 &&
@@ -212,6 +239,17 @@ void Scene1::onMouseDown(Event* event)
 
                 //地图上该点为炮塔
                 Map1[p.i][p.j] = TOWER;
+
+                //建造便便炮塔
+                auto Shit_Tower = Sprite::create("Theme/Shit/SmallShit.png");
+                Shit_Tower->setPosition(Vec2(x1, y1));
+                Shit_Tower->setTag(x1 * 10000 + y1*100);
+                this->addChild(Shit_Tower);
+            }
+            else {  //钱不够
+                //去除购买炮塔的图标
+                this->removeChild(Buy_Layer);
+
             }
         }     
         else {//若按下位置不在图标内
@@ -221,8 +259,10 @@ void Scene1::onMouseDown(Event* event)
             this->removeChild(Buy_Layer);
 
         }
+        return true;
     };
-    //在购买层中监听
+    //监听购买图标所在的层
+
     Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, Buy_Layer);
 
 
