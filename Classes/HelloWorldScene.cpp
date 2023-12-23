@@ -115,7 +115,7 @@ bool HelloWorld::init()
         this->addChild(sprite, 0);
     }
 
-
+    
     //auto spriteGcn= Sprite::create("grossini.png"); //创造精灵
     //this->addChild(spriteGcn, 0);  //将精灵加入到这个世界中
     //spriteGcn->setPosition(200, 170);//将精灵放在100,100的位置

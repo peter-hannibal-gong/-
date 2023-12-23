@@ -26,7 +26,7 @@ public:
 
     void goto_nest(Ref* psender);    //х╔╧жнОня
 
-
+    
     void CloseCallback(cocos2d::Ref* pSender);
 };
 

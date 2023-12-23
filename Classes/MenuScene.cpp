@@ -1,5 +1,6 @@
 #include "MenuScene.h"
 #include "Scene1.h"
+#include "Setting.h"
 #include<string>
 USING_NS_CC;
 
@@ -304,7 +305,7 @@ bool MenuScene::init()
         //将BOSS模式加入菜单中
         menu->addChild(BossModel_Item);
     }
-
+    
     //怪物窝按键
     auto MonsterNest_Item = MenuItemImage::create("/MenuScene/MonsterNest.png", "/MenuScene/MonsterNestSelected.png", CC_CALLBACK_1(MenuScene::CloseCallback, this));
 
@@ -323,7 +324,7 @@ bool MenuScene::init()
     }
 
     //设置按键
-    auto Set_Item = MenuItemImage::create("/MenuScene/Set.png", "/MenuScene/SetSelected.png", CC_CALLBACK_1(MenuScene::CloseCallback, this));
+    auto Set_Item = MenuItemImage::create("/MenuScene/Set.png", "/MenuScene/SetSelected.png", CC_CALLBACK_1(MenuScene::goto_helper, this));
     if (Set_Item == nullptr) {
         problemLoading("'Set.png' and 'SetSelected.png'");
     }
@@ -358,7 +359,7 @@ bool MenuScene::init()
 }
 
 
-void  MenuScene::goto_adventure(Ref* psender) 
+void MenuScene::goto_adventure(Ref* psender) 
 {
     //创建冒险模式选关场景
     auto GameScene1 = Scene1::createScene();
@@ -367,7 +368,14 @@ void  MenuScene::goto_adventure(Ref* psender)
     Director::getInstance()->replaceScene(TransitionFade::create(1.0f, GameScene1));
 }
 
+void  MenuScene::goto_helper(Ref* psender)
+{
+    //创建冒险模式选关场景
+    auto Setting = Setting::createScene();
 
+    //淡出，切换场景
+    Director::getInstance()->replaceScene(TransitionFade::create(0.5, Setting));
+}
 
 void MenuScene::CloseCallback(Ref* pSender)
 {
