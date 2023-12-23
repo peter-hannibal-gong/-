@@ -78,7 +78,6 @@ bool MenuScene::init()
 
     }
 
-
     //放置小云朵
     auto smallcloud = Sprite::create("/MenuScene/smallcloud.png");
     if (smallcloud == nullptr)   //找不到该图片
@@ -109,10 +108,9 @@ bool MenuScene::init()
         this->addChild(smallcloud);  
     }
 
-
-
     //放置萝卜 
-
+    const int rabbit_leaf_hang_time = 1;
+    const int rabbit_leaf_hang_range = 10;
     //放置左叶子
     auto leaf1 = Sprite::create("/MenuScene/leaf1.png");
     if (leaf1 == nullptr)   //找不到该图片
@@ -121,11 +119,25 @@ bool MenuScene::init()
     }
     else
     {
+        auto leaf1size = leaf1->getContentSize();
         //放置图片
-        leaf1->setPosition(Vec2(origin.x + visibleSize.width / 2-60 , origin.y + visibleSize.height / 2 +130));
-
+        leaf1->setPosition(Vec2(origin.x + leaf1size.width/2+ visibleSize.width / 2 - 60, origin.y - leaf1size.height/2 + visibleSize.height / 2 + 130));
+        
+        leaf1->setAnchorPoint(Vec2(1, 0));
+        //从左向右飘到界面外
+        auto leaf1_move1 = RotateTo::create(rabbit_leaf_hang_time, -rabbit_leaf_hang_range);
+        //回到原来位置
+        auto leaf1_move2 = RotateTo::create(rabbit_leaf_hang_time, rabbit_leaf_hang_range);
+        //回到原来位置
+        auto leaf1_move3 = RotateTo::create(rabbit_leaf_hang_time, 0);
+        //动作序列，先从左到右，暂停3s，回到原来位置
+        auto leaf1_sequence = Sequence::create(leaf1_move1, leaf1_move2, leaf1_move3,DelayTime::create(3), nullptr);
+        
+        //无限循环小云朵动作序列
+        leaf1->runAction(RepeatForever::create(leaf1_sequence));
         //将左叶子加入场景中
         this->addChild(leaf1);
+        
     }
 
     //放置右叶子
@@ -135,12 +147,27 @@ bool MenuScene::init()
         problemLoading("leaf2.png'");
     }
     else
-    {
+    {   
+        auto leaf2size = leaf2->getContentSize();
         //放置图片
-        leaf2->setPosition(Vec2(origin.x + visibleSize.width / 2 +90, origin.y + visibleSize.height / 2 + 130));
+        leaf2->setPosition(Vec2(origin.x - leaf2size.width / 2 + visibleSize.width / 2 +90, origin.y - leaf2size.height / 2 + visibleSize.height / 2 + 130));        
 
-        //将右叶子加入场景中
+        leaf2->setAnchorPoint(Vec2(0, 0));
+        //从左向右飘到界面外
+        auto leaf2_move1 = RotateTo::create(rabbit_leaf_hang_time, -rabbit_leaf_hang_range);
+        //回到原来位置
+        auto leaf2_move2 = RotateTo::create(rabbit_leaf_hang_time, rabbit_leaf_hang_range);
+        //回到原来位置
+        auto leaf2_move3 = RotateTo::create(rabbit_leaf_hang_time, 0);
+        //动作序列，先从左到右，暂停3s，回到原来位置
+        auto leaf2_sequence = Sequence::create(leaf2_move1, leaf2_move2, leaf2_move3, DelayTime::create(3), nullptr);
+
+        //无限循环小云朵动作序列
+        leaf2->runAction(RepeatForever::create(leaf2_sequence));
+        //将左叶子加入场景中
         this->addChild(leaf2);
+
+
     }
 
     //放置中间的叶子
@@ -151,11 +178,27 @@ bool MenuScene::init()
     }
     else
     {
+        auto leaf3size = leaf3->getContentSize();
         //放置图片
-        leaf3->setPosition(Vec2(origin.x + visibleSize.width / 2 + 10, origin.y + visibleSize.height / 2 + 160));
+        leaf3->setPosition(Vec2(origin.x + visibleSize.width / 2 + 10, origin.y - leaf3size.height / 2 + visibleSize.height / 2 + 160));
 
-        //将中间的叶子加入场景中
+
+        leaf3->setAnchorPoint(Vec2(0.5, 0));
+        //从左向右飘到界面外
+        auto leaf3_move1 = RotateTo::create(rabbit_leaf_hang_time, -rabbit_leaf_hang_range);
+        //回到原来位置
+        auto leaf3_move2 = RotateTo::create(rabbit_leaf_hang_time, rabbit_leaf_hang_range);
+        //回到原来位置
+        auto leaf3_move3 = RotateTo::create(rabbit_leaf_hang_time, 0);
+        //动作序列，先从左到右，暂停3s，回到原来位置
+        auto leaf3_sequence = Sequence::create(leaf3_move1, leaf3_move2, leaf3_move3, DelayTime::create(3), nullptr);
+
+        //无限循环小云朵动作序列
+        leaf3->runAction(RepeatForever::create(leaf3_sequence));
+        //将左叶子加入场景中
         this->addChild(leaf3);
+
+
     }
 
     //放置萝卜
@@ -200,15 +243,26 @@ bool MenuScene::init()
     else
     {
         //设置比例
-        bigcloud->setScale(0.9);
+        monster->setScale(0.9);
 
         //放置图片
         monster->setPosition(Vec2(origin.x + visibleSize.width / 5, origin.y + visibleSize.height*0.8));
 
+        //从上到下
+        auto monster_move1 = MoveTo::create(1.25, Vec2(monster->getPositionX(), monster->getPositionY() - 25));
+
+        //从下到上
+        auto monster_move2 = MoveTo::create(1.25, Vec2(monster->getPositionX(), monster->getPositionY() + 25));
+
+        //动作序列，先从左到右，暂停0s，回到原来位置
+        auto monster_sequence = Sequence::create(monster_move1, DelayTime::create(0), monster_move2, nullptr);
+
+        //无限循环怪物动作序列
+        monster->runAction(RepeatForever::create(monster_sequence));
+        
         //将怪物加入场景中
         this->addChild(monster);
     }
-
 
 
     //创建菜单
