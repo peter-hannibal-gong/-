@@ -1,4 +1,5 @@
 #include "Scene1.h"
+#include "ui/CocosGUI.h"
 USING_NS_CC;
 
 /*创建舞台*/
@@ -56,8 +57,6 @@ bool Scene1::init()
         this->addChild(map01, 0);
     }
 
-<<<<<<< HEAD
-=======
     // 添加怪物木牌
     auto Board = Sprite::create("Board.png");
     if (Board == nullptr)
@@ -200,14 +199,12 @@ bool Scene1::init()
     menu->addChild(PauseItemtoggle);
 
     /*-------------选项按键显示-------------*/
-    auto MenuItem = MenuItemImage::create("/Theme/Theme1/MenuItem.png","CloseSelected.png",CC_CALLBACK_1(Scene1::menuCloseCallback, this));
-    
-    MenuItem->setPosition(Vec2(origin.x + visibleSize.width * 0.88,origin.y + visibleSize.height * 0.94));
+
+    //auto MenuItem = Button::create("/GameScene/touming-hd.pvr_28.PNG", "/GameScene/touming-hd.pvr_26.PNG");
 
 
 
-    /*-------------触摸时间-------------*/
->>>>>>> b64f658e5abf13c66906fbb1ba4b6c50bd903416
+    /*-------------触摸事件-------------*/
     //触摸格点显示格子
     Sprite* grid[7][12];
     for (int i = 0; i < 7; i++) {
@@ -226,15 +223,10 @@ bool Scene1::init()
         }
     }
 
-<<<<<<< HEAD
-    auto mouseListener = EventListenerMouse::create();
+    Game_Start();
 
-    mouseListener->onMouseDown = CC_CALLBACK_1(Scene1::onMouseDown, this);
+  
 
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
-
-=======
-   
     auto mouseListener = EventListenerMouse::create();
 
     mouseListener->onMouseDown = CC_CALLBACK_1(Scene1::onMouseDown, this);
@@ -242,9 +234,9 @@ bool Scene1::init()
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
     
    
->>>>>>> b64f658e5abf13c66906fbb1ba4b6c50bd903416
     return true;
 }
+
 
 /*将坐标转化为格点坐标*/
 Position Scene1::transition(int x, int y)
@@ -255,7 +247,8 @@ Position Scene1::transition(int x, int y)
     return p;
 }
 
-/*鼠标点击显示格子*/
+
+/*鼠标点击显示格子和购买炮塔界面*/
 void Scene1::onMouseDown(Event* event)
 {
 
@@ -315,30 +308,12 @@ void Scene1::onMouseDown(Event* event)
         Tower1->setPosition(Vec2(x1 - Tower1->getContentSize().width / 2, y1 + Tower1->getContentSize().height));
         Buy_Layer->addChild(Tower1, 2);
 
-<<<<<<< HEAD
-    this->addChild(Buy_Layer);
-
-    //监听器，是否购买炮塔
-    auto listener = EventListenerTouchOneByOne::create();
-    listener->setSwallowTouches(true);
-    listener->onTouchBegan = [](Touch* touch, Event* event) {
-        return true;
-    };
-    listener->onTouchEnded = [this, Grid_Selcted, Tower1, Tower2,p,Buy_Layer,x1,y1](Touch* touch, Event* event) {
-        //若按下位置在第一个炮塔图标内
-        if (touch->getLocation().x >= Tower1->getPosition().x - Tower1->getContentSize().width / 2 &&
-            touch->getLocation().x <= Tower1->getPosition().x + Tower1->getContentSize().width / 2 &&
-            touch->getLocation().y >= Tower1->getPosition().y - Tower1->getContentSize().height / 2 &&
-            touch->getLocation().y <= Tower1->getPosition().y + Tower1->getContentSize().height / 2) {
-            if (money >=100) {//若钱够，则建造
-=======
         //显示便便炮塔的购买图标
         Tower2->setPosition(Vec2(x1 + Tower2->getContentSize().width / 2, y1 + Tower2->getContentSize().height));
         Buy_Layer->addChild(Tower2, 2);
 
         //将layer加入场景中
         this->addChild(Buy_Layer);
->>>>>>> b64f658e5abf13c66906fbb1ba4b6c50bd903416
 
         //监听器，是否购买炮塔
         auto listener = EventListenerTouchOneByOne::create();
@@ -362,46 +337,6 @@ void Scene1::onMouseDown(Event* event)
                     //格子不可见
                     Grid_Selcted->setVisible(false);
 
-<<<<<<< HEAD
-                auto Bottle_Tower = Sprite::create("Theme/Bottle/BigBottle.png");
-                Bottle_Tower->setPosition(Vec2(x1, y1));
-                this->addChild(Bottle_Tower);
-
-            }
-        }
-        else if (//若按下位置在第二个炮塔图标内
-            touch->getLocation().x >= Tower2->getPosition().x - Tower2->getContentSize().width / 2 &&
-            touch->getLocation().x <= Tower2->getPosition().x + Tower2->getContentSize().width / 2 &&
-            touch->getLocation().y >= Tower2->getPosition().y - Tower2->getContentSize().height / 2 &&
-            touch->getLocation().y <= Tower2->getPosition().y + Tower2->getContentSize().height / 2) {
-            if (money >=120) {//若钱够，则建造
-                // build_tower(position, tower_available[1]);
-                log("build_tower(position, tower_available[1])");
-
-                //花钱
-                money =money-120;
-
-                //格子不可见
-                Grid_Selcted->setVisible(false);
-
-                //去除购买炮塔的图标
-                this->removeChild(Buy_Layer);
-
-                //地图上该点为炮塔
-                Map1[p.i][p.j] = TOWER;
-            }
-        }     
-        else {//若按下位置不在图标内
-            //格子不可见
-            Grid_Selcted->setVisible(false);
-            //去除购买炮塔的图标
-            this->removeChild(Buy_Layer);
-
-        }
-    };
-    //在购买层中监听
-    Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, Buy_Layer);
-=======
                     //去除购买炮塔的图标
                     this->removeChild(Buy_Layer);
 
@@ -465,15 +400,69 @@ void Scene1::onMouseDown(Event* event)
             return true;
         };
         //监听购买图标所在的层
->>>>>>> b64f658e5abf13c66906fbb1ba4b6c50bd903416
 
         Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, Buy_Layer);
 
     }
 }
 
+/*游戏开始时倒计时*/
+void Scene1::Game_Start()
+{
+    //获取屏幕大小
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-void Scene1::menuCloseCallback(Ref* pSender)
+    //创建倒计时界面所在的层
+    auto CountDown_layer = Layer::create();
+    CountDown_layer->setPosition(Vec2::ZERO);
+    this->addChild(CountDown_layer);
+
+    //倒计时的背景
+    auto CountDownBackground = Sprite::create("/Theme/Theme1/CountDownBackground.png");
+    CountDownBackground->setPosition(Vec2(origin.x + visibleSize.width / 2,origin.y + visibleSize.height / 2));
+    CountDown_layer->addChild(CountDownBackground);
+    //三秒后淡出
+    CountDownBackground->runAction(Sequence::create(DelayTime::create(3), FadeOut::create(0.1), nullptr));
+
+    //倒计时圈
+    auto Circle = Sprite::create("/Theme/Theme1/CountDownCircle.png");
+    Circle->setPosition(Vec2(origin.x + visibleSize.width /2, origin.y + visibleSize.height / 2));
+    CountDown_layer->addChild(Circle);
+    //旋转360度重复三轮，淡出
+    Circle->runAction(Sequence::create(Repeat::create(RotateBy::create(1, -360), 3), FadeOut::create(0.1), nullptr));
+
+    //倒计时的数字3
+    auto number3 = Sprite::create("/Theme/Theme1/Number3.png");
+    number3->setPosition(Vec2(origin.x + visibleSize.width * 0.51,origin.y + visibleSize.height / 2));
+    CountDown_layer->addChild(number3);
+
+    //数字倒计时的动画
+    Vector<SpriteFrame*> frame;
+    frame.pushBack(SpriteFrame::create("/Theme/Theme1/Number3.png", Rect(0, 0, 95, 114)));
+    frame.pushBack(SpriteFrame::create("/Theme/Theme1/Number2.png", Rect(0, 0, 95, 114)));
+    frame.pushBack(SpriteFrame::create("/Theme/Theme1/Number1.png", Rect(0, 0, 95, 114)));
+    number3->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(frame, 1)), FadeOut::create(0.2), nullptr));
+      
+    //倒计时的时候所有可用格点闪烁
+    Sprite* grid[7][12];
+    for (int i = 0; i < 7; i++) {
+        for (int j = 0; j < 12; j++) {
+            grid[i][j] = Sprite::create("StartGrid.png");
+            if (Map1[i][j] == 0) {
+                //设置透明度
+                grid[i][j]->setOpacity(100);
+                //三秒内闪烁2次
+                grid[i][j]->runAction(Blink::create(3, 2));
+            }
+        }
+    }
+    //淡出，删除倒计时所在的层
+    CountDown_layer->runAction(Sequence::create(DelayTime::create(3.1), FadeOut::create(0.1), nullptr));
+    
+}
+
+void Scene1::CloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application
     Director::getInstance()->end();
