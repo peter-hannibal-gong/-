@@ -1,12 +1,10 @@
-
 #include "MenuScene.h"
 #include "Scene1.h"
 #include"MapChooseScene.h"
-#include "Helper.h"
 #include"Setting.h"
 #include<string>
-
 USING_NS_CC;
+
 /*创建场景*/
 Scene* MenuScene::createScene()
 {
@@ -308,7 +306,7 @@ bool MenuScene::init()
         //将BOSS模式加入菜单中
         menu->addChild(BossModel_Item);
     }
-    
+
     //怪物窝按键
     auto MonsterNest_Item = MenuItemImage::create("/MenuScene/MonsterNest.png", "/MenuScene/MonsterNestSelected.png", CC_CALLBACK_1(MenuScene::CloseCallback, this));
 
@@ -327,7 +325,7 @@ bool MenuScene::init()
     }
 
     //设置按键
-    auto Set_Item = MenuItemImage::create("/MenuScene/Set.png", "/MenuScene/SetSelected.png", CC_CALLBACK_1(MenuScene::goto_setting, this));
+    auto Set_Item = MenuItemImage::create("/MenuScene/Set.png", "/MenuScene/SetSelected.png", CC_CALLBACK_1(MenuScene::goto_helper, this));
     if (Set_Item == nullptr) {
         problemLoading("'Set.png' and 'SetSelected.png'");
     }
@@ -340,7 +338,7 @@ bool MenuScene::init()
     }
 
     //帮助按键
-    auto Help_Item = MenuItemImage::create("/MenuScene/Help.png", "/MenuScene/HelpSelected.png", CC_CALLBACK_1(MenuScene::goto_helper, this));
+    auto Help_Item = MenuItemImage::create("/MenuScene/Help.png", "/MenuScene/HelpSelected.png", CC_CALLBACK_1(MenuScene::CloseCallback, this));
     if (Help_Item == nullptr) {
         problemLoading("'Help.png' and 'HelpSelected.png'");
     }
@@ -352,8 +350,6 @@ bool MenuScene::init()
         menu->addChild(Help_Item);
     }
 
-
-
     //将菜单按键加入场景中
     this->addChild(menu);
 
@@ -362,7 +358,7 @@ bool MenuScene::init()
 }
 
 
-void  MenuScene::goto_adventure(Ref* psender)
+void  MenuScene::goto_adventure(Ref* psender) 
 {
     //创建冒险模式选关场景
     auto MapChoose = MapChooseScene::createScene();
@@ -371,22 +367,8 @@ void  MenuScene::goto_adventure(Ref* psender)
     Director::getInstance()->replaceScene(TransitionFade::create(1.0f, MapChoose));
 }
 
-void  MenuScene::goto_setting(Ref* psender)
-{
-    //创建冒险模式选关场景
-    auto Setting = Setting::createScene();
 
-    //淡出，切换场景
-    Director::getInstance()->replaceScene(TransitionFade::create(0.5, Setting));
-}
-void MenuScene::goto_helper(Ref* psender)
-{
-    //创建冒险模式选关场景
-    auto Helper = Helper::createScene();
 
-    //淡出，切换场景
-    Director::getInstance()->replaceScene(TransitionFade::create(0.5, Helper));
-}
 void MenuScene::CloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application
@@ -396,5 +378,15 @@ void MenuScene::CloseCallback(Ref* pSender)
 
     //EventCustom customEndEvent("game_scene_close_event");
     //_eventDispatcher->dispatchEvent(&customEndEvent);
+
+
 }
 
+void  MenuScene::goto_helper(Ref* psender)
+{
+    //创建冒险模式选关场景
+    auto Setting = Setting::createScene();
+
+    //淡出，切换场景
+    Director::getInstance()->replaceScene(TransitionFade::create(0.5, Setting));
+}

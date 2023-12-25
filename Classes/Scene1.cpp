@@ -1,5 +1,7 @@
 #include "Scene1.h"
 #include "ui/CocosGUI.h"
+#include"FlyMonster.h"
+#include "TowerShit.h"
 USING_NS_CC;
 
 /*创建舞台*/
@@ -13,6 +15,17 @@ static void problemLoading(const char* filename)
 {
     printf("Error while loading: %s\n", filename);
     printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in Scene1.cpp\n");
+}
+
+/*将坐标转化为格点坐标*/
+Position Scene1::transition(int x, int y)
+{
+    Position p; 
+    
+    p.i = 6 - (y / 80);
+    p.j = (x / 80) ;
+   
+    return p;
 }
 
 /*初始化*/
@@ -92,6 +105,7 @@ bool Scene1::init()
 
     //将钱转化为字符串，用32号字显示
     auto Money_Label = Label::createWithTTF(std::to_string(money), "/fonts/Marker Felt.ttf", 28);
+
     Money_Label->setName("MoneyLabel");
     //设置锚点
     Money_Label->setAnchorPoint(Vec2(0, 0.5));
@@ -204,7 +218,6 @@ bool Scene1::init()
 
 
 
-    /*-------------触摸事件-------------*/
     //触摸格点显示格子
     Sprite* grid[7][12];
     for (int i = 0; i < 7; i++) {
@@ -217,11 +230,54 @@ bool Scene1::init()
             //设置标签值
             grid[i][j]->setTag(i * 100 + j);  
 
-            //不显示
+            //初始为不可见
             grid[i][j]->setVisible(false); 
           
         }
     }
+
+    //炮塔显示数组,四维分别为7行，12列，2种塔，塔的可购买和不可购买图片
+    Sprite* Tower[7][12][2][2];
+    for (int i = 0; i < 7; i++)
+        for (int j = 0; j < 12; j++) {
+
+            //图标初始均为不可见
+            /*-------------------------瓶子炮塔------------------------*/
+            //不可购买图标
+            Tower[i][j][0][0] = Sprite::create("Theme/Theme1/TBottle0.png");
+            Tower[i][j][0][0]->setPosition(Vec2(grid[i][j]->getPosition().x - Tower[i][j][0][0]->getContentSize().width / 2,
+                grid[i][j]->getPosition().y + Tower[i][j][0][0]->getContentSize().height));
+            this->addChild(Tower[i][j][0][0],2);
+            Tower[i][j][0][0]->setVisible(false);
+            Tower[i][j][0][0]->setTag(100*i+j+1000);
+
+            //可购买图标
+            Tower[i][j][0][1] = Sprite::create("Theme/Theme1/TBottle1.png");
+            Tower[i][j][0][1]->setPosition(Vec2(grid[i][j]->getPosition().x - Tower[i][j][0][1]->getContentSize().width / 2,
+                grid[i][j]->getPosition().y + Tower[i][j][0][1]->getContentSize().height));
+            this->addChild(Tower[i][j][0][1],2);
+            Tower[i][j][0][1]->setVisible(false);
+            Tower[i][j][0][1]->setTag(100 * i + j +2000);
+
+            /*-------------------------便便炮塔------------------------*/
+            //不可购买图标
+            Tower[i][j][1][0] = Sprite::create("Theme/Theme1/TShit0.png");
+            Tower[i][j][1][0]->setPosition(Vec2(grid[i][j]->getPosition().x + Tower[i][j][1][0]->getContentSize().width / 2,
+                grid[i][j]->getPosition().y + Tower[i][j][1][0]->getContentSize().height));
+            this->addChild(Tower[i][j][1][0],2);
+            Tower[i][j][1][0]->setVisible(false);
+            Tower[i][j][1][0]->setTag(100 * i + j+3000);
+
+            //可购买图标
+            Tower[i][j][1][1] = Sprite::create("Theme/Theme1/TShit1.png");
+            Tower[i][j][1][1]->setPosition(Vec2(grid[i][j]->getPosition().x + Tower[i][j][1][1]->getContentSize().width / 2,
+                grid[i][j]->getPosition().y + Tower[i][j][1][1]->getContentSize().height));
+            this->addChild(Tower[i][j][1][1],2);
+            Tower[i][j][1][1]->setVisible(false);
+            Tower[i][j][1][1]->setTag(100 * i + j + 4000);
+        }
+
+
 
     Game_Start();
 
@@ -231,22 +287,33 @@ bool Scene1::init()
 
     mouseListener->onMouseDown = CC_CALLBACK_1(Scene1::onMouseDown, this);
 
+
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
     
    
+
+
+
+    auto flymonster = FlyMonster::createSprite();
+    //shit->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 3 + origin.y));
+    this->addChild(flymonster, 0);
+
+
+
     return true;
 }
 
-
-/*将坐标转化为格点坐标*/
-Position Scene1::transition(int x, int y)
+/*实时更新金钱*/
+void Scene1::update()
 {
-    Position p;
-    p.j = (x / 80) ;
-    p.i = 6 - (y / 80);
-    return p;
-}
+    //根据当前的money更新label
+    auto node = getChildByName("MoneyLabel");
 
+    Label* Money_Label = static_cast<Label*>(node);
+
+    Money_Label ->setString(std::to_string(money));
+
+}
 
 /*鼠标点击显示格子和购买炮塔界面*/
 void Scene1::onMouseDown(Event* event)
@@ -259,86 +326,124 @@ void Scene1::onMouseDown(Event* event)
     int x = e->getCursorX();
     int y = e->getCursorY();
     if (y < 560) {   //点击的位置不在菜单栏
+
         //当前鼠标点击的格子位置
         Position p = transition(x, y);
+
 
         //通过标签来获取当前的格子 
         Node* n = this->getChildByTag(p.i * 100 + p.j);
         Sprite* Grid_Selcted = static_cast<Sprite*>(n);
 
-        //当y没有超过地图范围，显示鼠标所在的格子
-        Grid_Selcted->setVisible(true);
+        //未显示格子的时候，若点击，需要显示格子和购买界面
+        if (grid_is_visible == 0) {
 
-        for (int i = 0; i < 7; i++)
-            for (int j = 0; j < 12; j++)
-                if (i * 100 + j != p.i * 100 + p.j) {
+            //
+            if (Map1[p.i][p.j] == 1)
+                return;
+             
+            Grid_Selcted->setVisible(true);
+            grid_is_visible = 1;
 
+            //其他格子不显示
+            for (int i = 0; i < 7; i++)
+                for (int j = 0; j < 12; j++)
+                    if (i * 100 + j != p.i * 100 + p.j) {
+
+                        //通过标签来获取该位置的格子
+                        Node* n = this->getChildByTag(i * 100 + j);
+                        Sprite* Grid_Selcted1 = static_cast<Sprite*>(n);
+
+                        //不显示
+                        Grid_Selcted1->setVisible(false);
+                    }
+
+
+            //显示购买界面
+            auto Tower1 = Sprite::create();
+            auto Tower2 = Sprite::create();
+
+            //钱不够显示灰色界面，钱够显示有色界面
+            if (money < 100) {
+                Node* n = this->getChildByTag(p.i * 100 + p.j +1000);
+                Tower1 = static_cast<Sprite*>(n);
+            }
+            else {
+                Node* n = this->getChildByTag(p.i * 100 + p.j +2000);
+                Tower1 = static_cast<Sprite*>(n);
+            }
+
+            if (money < 120) {
+                Node* n = this->getChildByTag(p.i * 100 + p.j + 3000);
+                Tower2 = static_cast<Sprite*>(n);
+            }
+            else {
+                Node* n = this->getChildByTag(p.i * 100 + p.j + 4000);
+                Tower2 = static_cast<Sprite*>(n);
+            }
+
+            Tower1->setVisible(true);
+            Tower2->setVisible(true);
+
+
+        }
+        else { //显示格子的时候，若点击，需要判断是否购买炮塔和取消显示
+            grid_is_visible = 0;
+            Sprite* Grid_Selected;
+            Sprite* Tower1;
+            Sprite* Tower2;
+
+            int x1;
+            int y1;  //保存当前显示的格子的位置
+
+            //获取当前显示的格子的位置
+            for (int i = 0; i < 7; i++)
+                for (int j = 0; j < 12; j++) {
                     //通过标签来获取该位置的格子
                     Node* n = this->getChildByTag(i * 100 + j);
-                    Sprite* Grid_Selcted = static_cast<Sprite*>(n);
+                    Sprite* Grid = static_cast<Sprite*>(n);
 
-                    //不显示
-                    Grid_Selcted->setVisible(false);
+                    if (Grid->isVisible()) {
+                        Grid_Selected = Grid;
+                        x1 = 40 + 80 * j;
+                        y1 = 40 + (6 - i) * 80;
+                    }
+
                 }
 
+            //获取当前显示的购买界面的位置
+            for (int i = 0; i < 7; i++)
+                for (int j = 0; j < 12; j++)
+                    for (int k = 0; k <= 1; k++)
+                        for (int t = 0; t <= 1; t++) {
+                            Node* n = this->getChildByTag(i * 100 + j  + (k*2+t+1)*1000);
+                            Sprite* Tower = static_cast<Sprite*>(n);
 
+                            if (Tower->isVisible()) {
+                                if (k == 0)
+                                    Tower1 = Tower;
 
-        //显示购买界面
+                                if (k == 1)
+                                    Tower2 = Tower;
+                            }
 
-        //创建一个layer，用于存放炮塔的购买图标，并且后续方便监听是否点击
-        auto Buy_Layer = Layer::create();
-
-        auto Tower1 = Sprite::create();
-        auto Tower2 = Sprite::create();
-
-        if (money < 100)
-            Tower1->setTexture("Theme/Theme1/TBottle0.png");
-        else
-            Tower1->setTexture("Theme/Theme1/TBottle1.png");
-
-        if (money < 120)
-            Tower2->setTexture("Theme/Theme1/TShit0.png");
-        else
-            Tower2->setTexture("Theme/Theme1/TShit1.png");
-
-        int x1 = 40 + p.j * 80;
-        int y1 = 40 + (6 - p.i) * 80;
-
-        //显示瓶子炮塔的购买图标
-        Tower1->setPosition(Vec2(x1 - Tower1->getContentSize().width / 2, y1 + Tower1->getContentSize().height));
-        Buy_Layer->addChild(Tower1, 2);
-
-        //显示便便炮塔的购买图标
-        Tower2->setPosition(Vec2(x1 + Tower2->getContentSize().width / 2, y1 + Tower2->getContentSize().height));
-        Buy_Layer->addChild(Tower2, 2);
-
-        //将layer加入场景中
-        this->addChild(Buy_Layer);
-
-        //监听器，是否购买炮塔
-        auto listener = EventListenerTouchOneByOne::create();
-        listener->setSwallowTouches(true);
-        listener->onTouchBegan = [](Touch* touch, Event* event) {
-            return true;
-        };
-        listener->onTouchEnded = [this, Grid_Selcted, Tower1, Tower2, p, Buy_Layer, x1, y1](Touch* touch, Event* event) {
+                        }
 
             //若按下位置在第一个炮塔图标内
-            if (touch->getLocation().x >= Tower1->getPosition().x - Tower1->getContentSize().width / 2 &&
-                touch->getLocation().x <= Tower1->getPosition().x + Tower1->getContentSize().width / 2 &&
-                touch->getLocation().y >= Tower1->getPosition().y - Tower1->getContentSize().height / 2 &&
-                touch->getLocation().y <= Tower1->getPosition().y + Tower1->getContentSize().height / 2) {
+            if (x >= Tower1->getPosition().x - Tower1->getContentSize().width / 2 &&
+                x <= Tower1->getPosition().x + Tower1->getContentSize().width / 2 &&
+                y >= Tower1->getPosition().y - Tower1->getContentSize().height / 2 &&
+                y <= Tower1->getPosition().y + Tower1->getContentSize().height / 2) {
                 if (money >= 100) {//若钱够，则建造
 
                     log("build_tower(position, tower_available[0])");
 
                     //花钱
                     money = money - 100;
+
                     //格子不可见
                     Grid_Selcted->setVisible(false);
 
-                    //去除购买炮塔的图标
-                    this->removeChild(Buy_Layer);
 
                     //地图上该点为炮塔
                     Map1[p.i][p.j] = TOWER;
@@ -346,22 +451,16 @@ void Scene1::onMouseDown(Event* event)
                     //建造瓶子炮塔
                     auto Bottle_Tower = Sprite::create("Theme/Bottle/SmallBottle.png");
                     Bottle_Tower->setPosition(Vec2(x1, y1));
-                    Bottle_Tower->setTag(x1 * 1000 + y1 * 10);
+                    //Bottle_Tower->setTag(x1 * 1000 + y1 * 10);
                     this->addChild(Bottle_Tower);
 
                 }
-                else {  //钱不够
-                    //去除购买炮塔的图标
-                    this->removeChild(Buy_Layer);
-
-                }
-
             }
             else if (//若按下位置在第二个炮塔图标内
-                touch->getLocation().x >= Tower2->getPosition().x - Tower2->getContentSize().width / 2 &&
-                touch->getLocation().x <= Tower2->getPosition().x + Tower2->getContentSize().width / 2 &&
-                touch->getLocation().y >= Tower2->getPosition().y - Tower2->getContentSize().height / 2 &&
-                touch->getLocation().y <= Tower2->getPosition().y + Tower2->getContentSize().height / 2) {
+                x >= Tower2->getPosition().x - Tower2->getContentSize().width / 2 &&
+                x <= Tower2->getPosition().x + Tower2->getContentSize().width / 2 &&
+                y >= Tower2->getPosition().y - Tower2->getContentSize().height / 2 &&
+                y <= Tower2->getPosition().y + Tower2->getContentSize().height / 2) {
                 if (money >= 120) {//若钱够，则建造
                     // build_tower(position, tower_available[1]);
                     log("build_tower(position, tower_available[1])");
@@ -372,38 +471,29 @@ void Scene1::onMouseDown(Event* event)
                     //格子不可见
                     Grid_Selcted->setVisible(false);
 
-                    //去除购买炮塔的图标
-                    this->removeChild(Buy_Layer);
-
                     //地图上该点为炮塔
                     Map1[p.i][p.j] = TOWER;
 
                     //建造便便炮塔
-                    auto Shit_Tower = Sprite::create("Theme/Shit/SmallShit.png");
+                    auto Shit_Tower = TowerShit::createSprite();
+
+                    //auto Shit_Tower = Sprite::create("Theme/Shit/SmallShit.png");
                     Shit_Tower->setPosition(Vec2(x1, y1));
-                    Shit_Tower->setTag(x1 * 10000 + y1 * 100);
+                    //Shit_Tower->setTag(x1 * 10000 + y1 * 100);
                     this->addChild(Shit_Tower);
                 }
-                else {  //钱不够
-                    //去除购买炮塔的图标
-                    this->removeChild(Buy_Layer);
-
-                }
-            }
-            else {//若按下位置不在图标内
-                //格子不可见
-                Grid_Selcted->setVisible(false);
-                //去除购买炮塔的图标
-                this->removeChild(Buy_Layer);
 
             }
-            return true;
-        };
-        //监听购买图标所在的层
 
-        Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, Buy_Layer);
-
+            //都不可见
+            Grid_Selected->setVisible(false);
+            Tower1->setVisible(false);
+            Tower2->setVisible(false);
+        }
     }
+
+
+    update();  //更新money
 }
 
 /*游戏开始时倒计时*/
@@ -412,6 +502,9 @@ void Scene1::Game_Start()
     //获取屏幕大小
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    //暂停游戏主循环
+    Director::getInstance()->pause();
 
     //创建倒计时界面所在的层
     auto CountDown_layer = Layer::create();
@@ -460,7 +553,12 @@ void Scene1::Game_Start()
     //淡出，删除倒计时所在的层
     CountDown_layer->runAction(Sequence::create(DelayTime::create(3.1), FadeOut::create(0.1), nullptr));
     
+    //恢复游戏主循环
+    Director::getInstance()->resume();
+    
+
 }
+
 
 void Scene1::CloseCallback(Ref* pSender)
 {
