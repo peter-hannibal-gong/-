@@ -27,18 +27,28 @@
 
 #include "cocos2d.h"
 
+
+
 class Helper : public cocos2d::Scene
 {
+private:
+    int Chapter = 0; //保存当前在第几张怪
 public:
+
+    //场景函数声明
     static cocos2d::Scene* createScene();
 
+    //初始化函数声明
     virtual bool init();
-    
-    // a selector callback
+
+    //回调函数声明
     void CloseCallback(cocos2d::Ref* pSender);
-    
-    // implement the "static create()" method manually
+
+    //创建Scene1对象的宏定义
     CREATE_FUNC(Helper);
+
 };
 
-#endif // __HELLOWORLD_SCENE_H__
+
+#endif // __HELPER_H__
+

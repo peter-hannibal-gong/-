@@ -544,9 +544,9 @@ void Scene1::Game_Start()
             grid[i][j] = Sprite::create("StartGrid.png");
             if (Map1[i][j] == 0) {
                 //设置透明度
-                grid[i][j]->setOpacity(100);
+                //grid[i][j]->setOpacity(100);
                 //三秒内闪烁2次
-                grid[i][j]->runAction(Blink::create(3, 2));
+                //grid[i][j]->runAction(Blink::create(3, 2));
             }
         }
     }
