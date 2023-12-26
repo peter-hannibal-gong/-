@@ -4,6 +4,10 @@
 #include "TowerShit.h"
 USING_NS_CC;
 
+//暂时存储要进行操作的位置
+int gchx = -1;
+int gchy = -1;
+
 /*创建舞台*/
 Scene* Scene1::createScene()
 {
@@ -279,13 +283,13 @@ bool Scene1::init()
 
 
 
-    Game_Start();
+    //Game_Start();
 
   
 
     auto mouseListener = EventListenerMouse::create();
 
-    mouseListener->onMouseDown = CC_CALLBACK_1(Scene1::onMouseDown, this);
+    mouseListener->onMouseDown = CC_CALLBACK_1(Scene1::gch_onMouseDown, this);
 
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
@@ -315,21 +319,218 @@ void Scene1::update()
 
 }
 
+void Scene1::gch_onMouseDown(Event* event)
+{
+    //获取事件
+    EventMouse* e = (EventMouse*)event;
+
+    //获取鼠标位置
+    int x = e->getCursorX();
+    int y = e->getCursorY();
+
+    if (y >= 560)//点击的位置在菜单栏
+        return;
+    //当前鼠标点击的格子位置
+    Position p = transition(x, y);
+    //通过标签来获取当前的格子 
+    Node* n = this->getChildByTag(p.i * 100 + p.j);
+    Sprite* Grid_Selcted = static_cast<Sprite*>(n);
+    //点击史
+    if (grid_is_visible == 0 && Map1[p.i][p.j]/100 == Shit) {
+        //史升级界面
+        return;
+    }
+    //点击瓶子
+    else if (grid_is_visible == 0 && Map1[p.i][p.j] / 100 == Bottle) {
+        //瓶子升级界面
+        return;
+    }
+    //点击道路
+    else if (grid_is_visible == 0 && Map1[p.i][p.j] / 100 == LOAD) {
+        //有怪打怪，没怪显示红色
+        return;
+    }
+    //点击障碍物
+    else if (grid_is_visible == 0 && Map1[p.i][p.j] / 100 == BLOCK) {
+        //优先攻击障碍物
+        return;
+    }
+    //点击位置为空且场上无购买选项
+    else if (grid_is_visible == 0 && Map1[p.i][p.j]/100 == EMPTY)
+    {
+        Grid_Selcted->setVisible(true);
+        grid_is_visible = 1;
+
+        gchx = p.i;
+        gchy = p.j;
+        //其他格子不显示
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 12; j++) {
+                if (i * 100 + j != p.i * 100 + p.j) {
+
+                    //通过标签来获取该位置的格子
+                    Node* n = this->getChildByTag(i * 100 + j);
+                    Sprite* Grid_Selcted1 = static_cast<Sprite*>(n);
+
+                    //不显示
+                    Grid_Selcted1->setVisible(false);
+                }
+            }
+        }
+        //显示购买界面
+        auto Tower1 = Sprite::create();
+        auto Tower2 = Sprite::create();
+
+        //钱不够显示灰色界面，钱够显示有色界面
+        if (money < 100) {
+            Node* n = this->getChildByTag(p.i * 100 + p.j + 1000);
+            Tower1 = static_cast<Sprite*>(n);
+        }
+        else {
+            Node* n = this->getChildByTag(p.i * 100 + p.j + 2000);
+            Tower1 = static_cast<Sprite*>(n);
+        }
+
+        if (money < 120) {
+            Node* n = this->getChildByTag(p.i * 100 + p.j + 3000);
+            Tower2 = static_cast<Sprite*>(n);
+        }
+        else {
+            Node* n = this->getChildByTag(p.i * 100 + p.j + 4000);
+            Tower2 = static_cast<Sprite*>(n);
+        }
+
+        Tower1->setVisible(true);
+        Tower2->setVisible(true);
+    }
+    //场上有购买界面
+    else if (grid_is_visible == 1) {
+        //显示格子的时候，若点击，需要判断是否购买炮塔和取消显示
+        grid_is_visible = 0;
+        Sprite* Grid_Selected;
+        Sprite* Tower1;
+        Sprite* Tower2;
+
+        int x1;
+        int y1;  //保存当前显示的格子的位置
+
+        //获取当前显示的格子的位置
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 12; j++) {
+                //通过标签来获取该位置的格子
+                Node* n = this->getChildByTag(i * 100 + j);
+                Sprite* Grid = static_cast<Sprite*>(n);
+
+                if (Grid->isVisible()) {
+                    Grid_Selected = Grid;
+                    x1 = 40 + 80 * j;
+                    y1 = 40 + (6 - i) * 80;
+                }
+            }
+        }
+        //获取当前显示的购买界面的位置
+        for (int i = 0; i < 7; i++)
+            for (int j = 0; j < 12; j++)
+                for (int k = 0; k <= 1; k++)
+                    for (int t = 0; t <= 1; t++) {
+                        Node* n = this->getChildByTag(i * 100 + j + (k * 2 + t + 1) * 1000);
+                        Sprite* Tower = static_cast<Sprite*>(n);
+
+                        if (Tower->isVisible()) {
+                            if (k == 0)
+                                Tower1 = Tower;
+
+                            if (k == 1)
+                                Tower2 = Tower;
+                        }
+
+                    }
+
+        //若按下位置在第一个炮塔图标内
+        if (x >= Tower1->getPosition().x - Tower1->getContentSize().width / 2 &&
+            x <= Tower1->getPosition().x + Tower1->getContentSize().width / 2 &&
+            y >= Tower1->getPosition().y - Tower1->getContentSize().height / 2 &&
+            y <= Tower1->getPosition().y + Tower1->getContentSize().height / 2) {
+            if (money >= 100) {//若钱够，则建造
+
+                log("build_tower(position, tower_available[0])");
+
+                //花钱
+                money = money - 100;
+
+                //格子不可见
+                Grid_Selcted->setVisible(false);
+
+
+                //地图上该点为炮塔
+                //Map1[p.i][p.j] = Bottle1;
+                Map1[gchx][gchy] = Bottle1;
+                gchx = -1;
+                gchy = -1;
+                //建造瓶子炮塔
+                auto Bottle_Tower = Sprite::create("Theme/Bottle/SmallBottle.png");
+                Bottle_Tower->setPosition(Vec2(x1, y1));
+                //Bottle_Tower->setTag(x1 * 1000 + y1 * 10);
+                this->addChild(Bottle_Tower);
+
+            }
+        }
+        else if (//若按下位置在第二个炮塔图标内
+            x >= Tower2->getPosition().x - Tower2->getContentSize().width / 2 &&
+            x <= Tower2->getPosition().x + Tower2->getContentSize().width / 2 &&
+            y >= Tower2->getPosition().y - Tower2->getContentSize().height / 2 &&
+            y <= Tower2->getPosition().y + Tower2->getContentSize().height / 2) {
+            if (money >= 120) {//若钱够，则建造
+                // build_tower(position, tower_available[1]);
+                log("build_tower(position, tower_available[1])");
+
+                //花钱
+                money = money - 120;
+
+                //格子不可见
+                Grid_Selcted->setVisible(false);
+
+                //地图上该点为炮塔
+                Map1[p.i][p.j] = Shit1;
+
+                //建造便便炮塔
+                auto Shit_Tower = TowerShit::createSprite();
+
+                //auto Shit_Tower = Sprite::create("Theme/Shit/SmallShit.png");
+                Shit_Tower->setPosition(Vec2(x1, y1));
+                //Shit_Tower->setTag(x1 * 10000 + y1 * 100);
+                this->addChild(Shit_Tower);
+            }
+
+        }
+
+        //都不可见
+        Grid_Selected->setVisible(false);
+        Tower1->setVisible(false);
+        Tower2->setVisible(false);
+    }
+    else {
+        auto lllzty = Sprite::create("grossini.png");
+        lllzty->setPosition(Vec2(100, 100));
+        this->addChild(lllzty);
+    }
+    update();
+
+}
 /*鼠标点击显示格子和购买炮塔界面*/
 void Scene1::onMouseDown(Event* event)
 {
-
     //获取事件
     EventMouse* e = (EventMouse*)event;
     
     //获取鼠标位置
     int x = e->getCursorX();
     int y = e->getCursorY();
+    
     if (y < 560) {   //点击的位置不在菜单栏
 
         //当前鼠标点击的格子位置
         Position p = transition(x, y);
-
 
         //通过标签来获取当前的格子 
         Node* n = this->getChildByTag(p.i * 100 + p.j);
@@ -338,9 +539,11 @@ void Scene1::onMouseDown(Event* event)
         //未显示格子的时候，若点击，需要显示格子和购买界面
         if (grid_is_visible == 0) {
 
-            //
-            if (Map1[p.i][p.j] == 1)
+            //该位置不是可放置的点
+            if (Map1[p.i][p.j] / 100 != EMPTY) {
                 return;
+            }
+                
              
             Grid_Selcted->setVisible(true);
             grid_is_visible = 1;
@@ -446,8 +649,7 @@ void Scene1::onMouseDown(Event* event)
 
 
                     //地图上该点为炮塔
-                    Map1[p.i][p.j] = TOWER;
-
+                    Map1[p.i][p.j] = Bottle1;
                     //建造瓶子炮塔
                     auto Bottle_Tower = Sprite::create("Theme/Bottle/SmallBottle.png");
                     Bottle_Tower->setPosition(Vec2(x1, y1));
@@ -472,7 +674,7 @@ void Scene1::onMouseDown(Event* event)
                     Grid_Selcted->setVisible(false);
 
                     //地图上该点为炮塔
-                    Map1[p.i][p.j] = TOWER;
+                    Map1[p.i][p.j] = Shit1;
 
                     //建造便便炮塔
                     auto Shit_Tower = TowerShit::createSprite();

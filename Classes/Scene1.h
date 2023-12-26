@@ -7,12 +7,27 @@
 const int Column_Size = 12;  //横向12个格子
 const int Row_Size = 7;      //纵向7个格子
 const int Total_Wave_Number = 15;
-#define EMPTY 0             //该格子为空
-#define TOWER 1             //该格子为塔
-#define INCAPABLE 2         //该格子不能放东西
 
-#define Tower_Bottle 3   //瓶子炮塔
-#define Tower_Shit 4     //便便炮塔
+//点位种类读取读取：x/100==检测值
+//点位种类赋予：x=赋值
+//该格子为空
+#define EMPTY   000     //检测值//赋值
+//该格子为障碍物
+#define BLOCK         9  //检测值
+#define BLOCK_aggsign 999//赋值
+//该格子为路
+#define LOAD          8  //检测值
+#define LOAD_aggsign  888//赋值
+//瓶子炮塔
+#define Bottle  1  //检测值
+#define Bottle1 101//赋值
+#define Bottle2 102//赋值
+#define Bottle3 103//赋值
+//便便炮塔
+#define Shit    2  //检测值
+#define Shit1   201//赋值
+#define Shit2   202//赋值
+#define Shit3   203//赋值
 
 //表示第i列第j行的格子
 struct Position  
@@ -42,13 +57,17 @@ public:
     //第一关地图,表示哪些地方可以放置炮塔
     int Map1[Row_Size][Column_Size] =
     { 
-    {0,0,0,1,1,1,1,1,1,0,0,0},
-    {0,1,0,1,1,1,1,1,1,0,1,0},
-    {0,1,0,0,1,0,0,1,0,0,1,0},
-    {0,1,1,0,1,1,1,1,0,1,1,0},
-    {0,1,1,1,1,1,1,1,1,1,1,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0},
-    {1,1,0,0,0,0,0,0,0,0,1,1}};
+    {EMPTY,EMPTY,EMPTY,BLOCK_aggsign,BLOCK_aggsign,BLOCK_aggsign,BLOCK_aggsign,BLOCK_aggsign,BLOCK_aggsign,EMPTY,EMPTY,EMPTY},
+    {EMPTY,LOAD_aggsign,EMPTY,BLOCK_aggsign,BLOCK_aggsign,BLOCK_aggsign,BLOCK_aggsign,BLOCK_aggsign,BLOCK_aggsign,EMPTY,LOAD_aggsign,EMPTY},
+    {EMPTY,LOAD_aggsign,EMPTY,EMPTY,BLOCK_aggsign,EMPTY,EMPTY,BLOCK_aggsign,EMPTY,EMPTY,LOAD_aggsign,EMPTY},
+    {EMPTY,LOAD_aggsign,BLOCK_aggsign,EMPTY,LOAD_aggsign,LOAD_aggsign,LOAD_aggsign,LOAD_aggsign,EMPTY,BLOCK_aggsign,LOAD_aggsign,EMPTY},
+    {EMPTY,LOAD_aggsign,LOAD_aggsign,LOAD_aggsign,LOAD_aggsign,BLOCK_aggsign,BLOCK_aggsign,LOAD_aggsign,LOAD_aggsign,LOAD_aggsign,LOAD_aggsign,EMPTY},
+    {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY},
+    {EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY}
+
+
+    };
+
 
     //炮塔的地图
     int TowerMap1[Row_Size][Column_Size] = {
@@ -78,9 +97,11 @@ public:
 
     //鼠标点击事件
     void onMouseDown(cocos2d::Event* event);
-
+    void gch_onMouseDown(cocos2d::Event* event);
     //游戏开始倒计时
     void Game_Start();
+
+    
 
     //实时更新金钱
     void update();
