@@ -1,29 +1,11 @@
-/****************************************************************************
- Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
- 
- http://www.cocos2d-x.org
- 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
- 
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
- 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
+
 
 #include "HelloWorldScene.h"
+#include "ui/CocosGUI.h"
 
+
+#include"TowerShit.h"
+#include"FlyMonster.h"
 USING_NS_CC;
 
 Scene* HelloWorld::createScene()//创建舞台
@@ -101,10 +83,10 @@ bool HelloWorld::init()
     }
 
     // add "HelloWorld" splash screen"
-    auto sprite = Sprite::create("1.jpg");
+    auto sprite = Sprite::create("/Theme/Theme1/background.png");
     if (sprite == nullptr)
     {
-        problemLoading("'1.jpg'");
+        problemLoading("'/Theme/Theme1/map01.png'");
     }
     else
     {
@@ -115,27 +97,27 @@ bool HelloWorld::init()
         this->addChild(sprite, 0);
     }
 
-    
+
     //auto spriteGcn= Sprite::create("grossini.png"); //创造精灵
     //this->addChild(spriteGcn, 0);  //将精灵加入到这个世界中
     //spriteGcn->setPosition(200, 170);//将精灵放在100,100的位置
 
 
 
-    auto spritecache = SpriteFrameCache::getInstance();
-    spritecache->addSpriteFramesWithFile("monster.plist");   //将图集放入缓存中
-    spritecache->addSpriteFramesWithFile("object.plist");
+    //auto spritecache = SpriteFrameCache::getInstance();
+    //spritecache->addSpriteFramesWithFile("monster.plist");   //将图集放入缓存中
+    //spritecache->addSpriteFramesWithFile("object.plist");
 
-    auto Monster01 = Sprite::createWithSpriteFrameName("Monster01.png");
-    this->addChild(Monster01, 0);
-    Monster01->setPosition(750, 750);   //通过缓存创建精灵
+    //auto Monster01 = Sprite::createWithSpriteFrameName("Monster01.png");
+    //this->addChild(Monster01, 0);
+    //Monster01->setPosition(750, 750);   //通过缓存创建精灵
 
-    auto move1 = MoveTo::create(2, Vec2(1170, 750));
-    Monster01->runAction(move1);
+    //auto move1 = MoveTo::create(2, Vec2(1170, 750));
+    //Monster01->runAction(move1);
 
-    auto Object07 = Sprite::createWithSpriteFrameName("Object07.png");
-    this->addChild(Object07, 0);
-    Object07->setPosition(550, 750);   //通过缓存创建精灵
+    //auto Object07 = Sprite::createWithSpriteFrameName("Object07.png");
+    //this->addChild(Object07, 0);
+    //Object07->setPosition(550, 750);   //通过缓存创建精灵
 
 
 
@@ -150,6 +132,22 @@ bool HelloWorld::init()
     //auto spriteGcn= Sprite::create("grossini.png"); //创造精灵
     //this->addChild(spriteGcn, 0);  //将精灵加入到这个世界中
     //spriteGcn->setPosition(200, 170);//将精灵放在100,100的位置 
+
+
+
+    auto flymonster=FlyMonster::createSprite();
+    //shit->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 3 + origin.y));
+    this->addChild(flymonster,0);
+
+
+    //flymonster ->setVisible(false);
+    
+    
+
+    //auto monster = getChildByTag();
+    //monster->stopActionByTag(1);
+
+
 
     return true;
 }

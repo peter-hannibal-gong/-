@@ -1,13 +1,18 @@
 #include "Scene1.h"
 #include "ui/CocosGUI.h"
 #include"FlyMonster.h"
+#include"PinkMonster.h"
+#include"GreenMonster.h"
 #include "TowerShit.h"
+#include"MonsterFactory.h"
+#include"carrot.h"
 USING_NS_CC;
 
 //暂时存储要进行操作的位置
 int gchx = -1;
 int gchy = -1;
 
+int TowerType;
 /*创建舞台*/
 Scene* Scene1::createScene()
 {
@@ -295,20 +300,33 @@ bool Scene1::init()
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
     
    
+    auto Carrot = Carrot::createSprite();
+    Carrot->setPosition(Vec2(80*11-40,80*6));
+    this->addChild(Carrot);
+    //auto flymonster = FlyMonster::createSprite();
+    //this->addChild(flymonster, 2);
 
+    auto pinkmonster = PinkMonster::createSprite();
+    this->addChild(pinkmonster,2);
 
+    //auto greenmonster = GreenMonster::createSprite();
+    //this->addChild(greenmonster,2);
 
-    auto flymonster = FlyMonster::createSprite();
-    //shit->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 3 + origin.y));
-    this->addChild(flymonster, 0);
+    //0.2秒刷新一次金钱
+    schedule(CC_SCHEDULE_SELECTOR(Scene1::updateMoney), 0.2f);
 
+    //10秒刷新波数
+    schedule(CC_SCHEDULE_SELECTOR(Scene1::updateWave), 3.0f);
 
-
+    //每1秒出现一只怪物 
+    schedule(CC_SCHEDULE_SELECTOR(Scene1::updateMonster), 1.0f);
+    
+   
     return true;
 }
 
 /*实时更新金钱*/
-void Scene1::update()
+void Scene1::updateMoney(float dt)
 {
     //根据当前的money更新label
     auto node = getChildByName("MoneyLabel");
@@ -317,6 +335,61 @@ void Scene1::update()
 
     Money_Label ->setString(std::to_string(money));
 
+}
+
+/*实时更新波数*/
+void Scene1::updateWave(float dt)
+{
+    
+    //波数加一，并且更新显示
+    wave++;
+    if (wave <= Total_Wave_Number) {
+        auto node = getChildByName("WavesLabel");
+
+        Label* Wave_Label = static_cast<Label*>(node);
+
+        Wave_Label->setString(std::to_string(wave / 10 % 10) + "    " + std::to_string(wave % 10));
+
+    }
+    else { //超过最大波数不更新波数标签
+        //游戏结束，若萝卜还有血量，则游戏结束
+        //跳转
+
+    }
+    //当进行到最后一波时，停止计数
+    if (wave == Total_Wave_Number+1) {
+        unschedule(CC_SCHEDULE_SELECTOR(Scene1::updateWave)); 
+    }
+
+}
+
+/*间隔一定时间生产怪物*/
+void Scene1::updateMonster(float dt)
+{
+  
+    //定义一个怪物工厂
+    MonsterFactory p;
+
+    //通过数组位置保存的怪物类型，生成相应类型的怪物
+    Sprite* Monster = p.Produce_Monster(Monster_Wave[wave-1][Monster_Order]);
+
+    this->addChild(Monster);
+
+  
+
+    Monster_Order = (Monster_Order + 1) % Monster_Number;
+
+    //当进行到最后一波的最后一只怪物的时候,停止计数
+    if (wave == Total_Wave_Number&& Monster_Order== Monster_Number-1) {
+        unschedule(CC_SCHEDULE_SELECTOR(Scene1::updateMonster));
+    }
+
+}
+
+//监测是否有怪物到达终点，吃到萝卜
+void Scene1::If_Attack_Carrot(float dt)
+{
+   
 }
 
 void Scene1::gch_onMouseDown(Event* event)
@@ -328,35 +401,49 @@ void Scene1::gch_onMouseDown(Event* event)
     int x = e->getCursorX();
     int y = e->getCursorY();
 
-    if (y >= 560)//点击的位置在菜单栏
+    //点击的位置在菜单栏
+    if (y >= 560)
         return;
+
     //当前鼠标点击的格子位置
     Position p = transition(x, y);
+
     //通过标签来获取当前的格子 
     Node* n = this->getChildByTag(p.i * 100 + p.j);
     Sprite* Grid_Selcted = static_cast<Sprite*>(n);
     //点击史
-    if (grid_is_visible == 0 && Map1[p.i][p.j]/100 == Shit) {
-        //史升级界面
+    if (grid_is_visible == 0 &&range_is_visible==0 && Map1[p.i][p.j]/100 == Shit) {
+    
+        //通过tag获取点击的炮塔对象
+        Node* node = this->getChildByTag(p.i * 100 + p.j + 5000);
+        TowerShit* Tower = static_cast<TowerShit*>(node);
+        Tower->Show_RangeAndGrade(this,money);
+                  
+        range_is_visible = 1;
+        TowerType = Shit; //当前显示范围的炮塔为便便
+        gchx = p.i;
+        gchy = p.j;   //保存当前塔的位置
         return;
     }
+   
     //点击瓶子
-    else if (grid_is_visible == 0 && Map1[p.i][p.j] / 100 == Bottle) {
+    else if (grid_is_visible == 0 && range_is_visible == 0 && Map1[p.i][p.j] / 100 == Bottle) {
         //瓶子升级界面
         return;
     }
+
     //点击道路
-    else if (grid_is_visible == 0 && Map1[p.i][p.j] / 100 == LOAD) {
-        //有怪打怪，没怪显示红色
+    else if (grid_is_visible == 0 && range_is_visible == 0 && Map1[p.i][p.j] / 100 == LOAD) {
+        //有怪打怪，没怪显示红色                                                                                                                  
         return;
     }
     //点击障碍物
-    else if (grid_is_visible == 0 && Map1[p.i][p.j] / 100 == BLOCK) {
+    else if (grid_is_visible == 0 && range_is_visible == 0 && Map1[p.i][p.j] / 100 == BLOCK) {
         //优先攻击障碍物
         return;
     }
     //点击位置为空且场上无购买选项
-    else if (grid_is_visible == 0 && Map1[p.i][p.j]/100 == EMPTY)
+    else if (grid_is_visible == 0 && range_is_visible == 0 && Map1[p.i][p.j]/100 == EMPTY)
     {
         Grid_Selcted->setVisible(true);
         grid_is_visible = 1;
@@ -403,6 +490,7 @@ void Scene1::gch_onMouseDown(Event* event)
         Tower1->setVisible(true);
         Tower2->setVisible(true);
     }
+
     //场上有购买界面
     else if (grid_is_visible == 1) {
         //显示格子的时候，若点击，需要判断是否购买炮塔和取消显示
@@ -411,6 +499,7 @@ void Scene1::gch_onMouseDown(Event* event)
         Sprite* Tower1;
         Sprite* Tower2;
 
+        int i1, j1;
         int x1;
         int y1;  //保存当前显示的格子的位置
 
@@ -425,6 +514,8 @@ void Scene1::gch_onMouseDown(Event* event)
                     Grid_Selected = Grid;
                     x1 = 40 + 80 * j;
                     y1 = 40 + (6 - i) * 80;
+                    i1 = i;
+                    j1 = j;
                 }
             }
         }
@@ -490,11 +581,14 @@ void Scene1::gch_onMouseDown(Event* event)
                 //格子不可见
                 Grid_Selcted->setVisible(false);
 
-                //地图上该点为炮塔
-                Map1[p.i][p.j] = Shit1;
+                //地图上该点为便便炮塔
+                Map1[gchx][gchy] = Shit1;
 
                 //建造便便炮塔
                 auto Shit_Tower = TowerShit::createSprite();
+
+                //设置该塔的标签
+                Shit_Tower->setTag(100*i1+j1+5000);
 
                 //auto Shit_Tower = Sprite::create("Theme/Shit/SmallShit.png");
                 Shit_Tower->setPosition(Vec2(x1, y1));
@@ -509,14 +603,39 @@ void Scene1::gch_onMouseDown(Event* event)
         Tower1->setVisible(false);
         Tower2->setVisible(false);
     }
+    //场上有攻击范围显示和升级界面
+    else if (range_is_visible==1) {
+
+        if (TowerType == Shit) {
+            Node* node = this->getChildByTag(gchx * 100 + gchy + 5000);
+            TowerShit* Tower = static_cast<TowerShit*>(node);
+            
+            //若按下的位置在升级位置
+            if ((x >= gchy * 80 && x <= gchy * 80 + 80 && y >= (6 - gchx) * 80+80  && y <= (6 - gchx) * 80 + 160)) {
+                if (money >= Tower->upgradecost[Tower->level]) { //钱够
+                    //升级，更换塔的形象
+                    Tower->Upgrade(this);
+                    Tower->attack(this);
+                    //扣钱
+                    money = money - Tower->upgradecost[Tower->level];
+                }
+                
+            }
+            Tower->Hide_RangeAndGrade(this);
+        }
+            
+        //点击完成后范围不可见
+        range_is_visible = 0;
+    }
     else {
         auto lllzty = Sprite::create("grossini.png");
         lllzty->setPosition(Vec2(100, 100));
-        this->addChild(lllzty);
+        this->addChild(lllzty,3);
     }
-    update();
 
+    
 }
+
 /*鼠标点击显示格子和购买炮塔界面*/
 void Scene1::onMouseDown(Event* event)
 {
@@ -596,6 +715,9 @@ void Scene1::onMouseDown(Event* event)
             Sprite* Tower1;
             Sprite* Tower2;
 
+            int i1;
+            int j1;
+
             int x1;
             int y1;  //保存当前显示的格子的位置
 
@@ -610,6 +732,8 @@ void Scene1::onMouseDown(Event* event)
                         Grid_Selected = Grid;
                         x1 = 40 + 80 * j;
                         y1 = 40 + (6 - i) * 80;
+                        i1 = i;
+                        j1 = j;
                     }
 
                 }
@@ -678,6 +802,7 @@ void Scene1::onMouseDown(Event* event)
 
                     //建造便便炮塔
                     auto Shit_Tower = TowerShit::createSprite();
+                    Shit_Tower->setTag(i1*100+j1+5000);
 
                     //auto Shit_Tower = Sprite::create("Theme/Shit/SmallShit.png");
                     Shit_Tower->setPosition(Vec2(x1, y1));
@@ -695,7 +820,7 @@ void Scene1::onMouseDown(Event* event)
     }
 
 
-    update();  //更新money
+
 }
 
 /*游戏开始时倒计时*/

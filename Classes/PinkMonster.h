@@ -1,19 +1,18 @@
 
-#ifndef __CarrotFantasy__FLYMONSTER_
-#define __CarrotFantasy__FLYMONSTER__
+#ifndef __CarrotFantasy__PINKMONSTER_
+#define __CarrotFantasy__PINKMONSTER__
 #include "ui/CocosGUI.h"
 #include "cocos2d.h"
 #include"Scene1.h"
 USING_NS_CC;
-class FlyMonster : public cocos2d::Sprite
+class PinkMonster : public cocos2d::Sprite
 {
 public:
 
-	int speed = 110;
+	int speed = 70;
 	int Hp;
 	int ATK = 1;  //怪物的攻击值
 	int value = 14; //击杀怪物获得的钱
-	float delaytime;
 
 	ProgressTimer* BloodBar;
 
@@ -21,14 +20,12 @@ public:
 	
 	virtual bool init();
 
-	CREATE_FUNC(FlyMonster);
+	CREATE_FUNC(PinkMonster);
 
 	void Move(Position p[],int num);  //通过路径进行移动
 
 	void Init_Route(Position p[]);   //初始化路径
 
 	void updateHp(float dt);  //更新血量
-
-
 };
-#endif /* defined(__CarrotFantasy__FlyMonster__) */
+#endif /* defined(__CarrotFantasy__PinkMonster__) */

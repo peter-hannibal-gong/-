@@ -14,10 +14,7 @@ public:
     
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
-
-    void CloseHitSound(Ref* pSender);
-
-    void Closebgm(Ref* pSender);
+    
     // implement the "static create()" method manually
     CREATE_FUNC(Setting);
 };

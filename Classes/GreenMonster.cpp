@@ -1,18 +1,18 @@
 
-#include "FlyMonster.h"
+#include "GreenMonster.h"
 #include "ui/CocosGUI.h"
 USING_NS_CC;
 using  namespace ui;
 
 
-Sprite* FlyMonster::createSprite()
+Sprite* GreenMonster::createSprite()
 {
 
-    return FlyMonster::create();
+    return GreenMonster::create();
 }
 
 
-bool FlyMonster::init()
+bool GreenMonster::init()
 {
     if (!Sprite::init()) {
         return false;
@@ -21,8 +21,8 @@ bool FlyMonster::init()
     
     //设置帧动画
     Vector<SpriteFrame*> frame;
-    frame.pushBack(SpriteFrame::create("/Monster/FlyMonster/Monster03.png", Rect(0, 0, 100, 80)));
-    frame.pushBack(SpriteFrame::create("/Monster/FlyMonster/Monster04.png", Rect(0, 0, 100, 80)));
+    frame.pushBack(SpriteFrame::create("/Monster/GreenMonster/Monster07.png", Rect(0, 0, 100, 80)));
+    frame.pushBack(SpriteFrame::create("/Monster/GreenMonster/Monster08.png", Rect(0, 0, 100, 80)));
    
     float animationdelay = 0.25f;
     auto animation = Animation::createWithSpriteFrames(frame, animationdelay);
@@ -50,7 +50,7 @@ bool FlyMonster::init()
 
     //创建生命值血条
     auto HpBarBG = Sprite::create("/Monster/BloodBarBg.png");
-    HpBarBG->setPosition(Vec2(getContentSize().width / 2+55, getContentSize().height / 2+90));
+    HpBarBG->setPosition(Vec2(getContentSize().width / 2+35, getContentSize().height / 2+90));
     HpBarBG->setScale(0.8);
     addChild(HpBarBG);
 
@@ -65,13 +65,13 @@ bool FlyMonster::init()
     //设置血条初始值
     BloodBar->setPercentage(100.0f);
 
-    schedule(CC_SCHEDULE_SELECTOR(FlyMonster::updateHp), 1.0f);
+    schedule(CC_SCHEDULE_SELECTOR(GreenMonster::updateHp), 1.0f);
 
     return true;
 }
 
 /*初始化路径*/
-void FlyMonster::Init_Route(Position p[])
+void GreenMonster::Init_Route(Position p[])
 {
 
     int Map1[Row_Size][Column_Size] =
@@ -124,7 +124,7 @@ void FlyMonster::Init_Route(Position p[])
 }
 
 /*移动*/
-void FlyMonster::Move(Position p[],int num)
+void GreenMonster::Move(Position p[],int num)
 {
 
     //获取分辨率（窗口大小）
@@ -134,7 +134,7 @@ void FlyMonster::Move(Position p[],int num)
     //初始位置
     int x = p[0].j * 80 + 40;
     int y = (6 - p[0].i) * 80 + 40;
-    this->setPosition(Vec2(origin.x + x, origin.y + y+20));
+    this->setPosition(Vec2(origin.x + x+20, origin.y + y+20));
 
     MoveBy* move[18];
 
@@ -148,11 +148,11 @@ void FlyMonster::Move(Position p[],int num)
         move[i] = MoveBy::create(40.0/speed, Vec2(x2 - x1, y2 - y1));
    
     }
-    auto delay=DelayTime::create(delaytime);
+    //DelayTime::create(3)
     //auto move1 = MoveTo::create(3, Vec2(origin.x + x, origin.y + y));
 
     //移动，到达终点后淡出
-    auto sequence = Sequence::create(delay,move[1],move[2],move[3],move[4],move[5],move[6],
+    auto sequence = Sequence::create(move[1],move[2],move[3],move[4],move[5],move[6],
         move[7],move[8],move[9],move[10],move[11],move[12],move[13],move[14],move[15],
         move[16],move[17], FadeOut::create(0.05), nullptr);
 
@@ -168,16 +168,15 @@ void FlyMonster::Move(Position p[],int num)
 }
 
 /*实时更新血量值*/
-void FlyMonster::updateHp(float dt)
+void GreenMonster::updateHp(float dt)
 {
 
     Hp = Hp - 15;
     if (Hp <= 0) {
-        unschedule(CC_SCHEDULE_SELECTOR(FlyMonster::update));
+        unschedule(CC_SCHEDULE_SELECTOR(GreenMonster::update));
         this->setVisible(false);
         //removeFromParent();//让怪消失
     }
     BloodBar->setPercentage(float(Hp));
 }
-
 
