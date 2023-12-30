@@ -1,8 +1,12 @@
-
 #include "TowerShit.h"
-USING_NS_CC;
+#include "FlyMonster.h"
+#include "Scene1.h"
+#include<vector>
+extern std::vector <FlyMonster*> m;  //用于存放怪物
+extern Scene* se;
+FlyMonster* target;
 
-
+using namespace std;
 Sprite* TowerShit::createSprite()
 {
 
@@ -16,36 +20,26 @@ bool TowerShit::init()
         return false;
     }
 
+    target = nullptr;  //攻击的目标，初始为nullptr
+    //Scene* scene = se;
+
+   
+    //scene->setName("Scene");
+
     //设置图片
     this->initWithFile("/Theme/Shit/SmallShit.png");
     
-    //设置帧动画
-    Vector<SpriteFrame*> frame;
-    frame.pushBack(SpriteFrame::create("/Theme/Shit/BigShit.png", Rect(0, 0, 70, 70)));
-    frame.pushBack(SpriteFrame::create("/Theme/Shit/BigShit2.png", Rect(0, 0, 70, 70)));
-    frame.pushBack(SpriteFrame::create("/Theme/Shit/BigShit.png", Rect(0, 0, 70, 70)));
 
-    float animationdelay = 0.3f;
-    auto animation = Animation::createWithSpriteFrames(frame, animationdelay);
+    //每0.2s更新一次攻击目标
+    schedule(CC_SCHEDULE_SELECTOR(TowerShit::checkAtkTarget),1.0f);
 
-    //表示无限循环
-    int repeatTime = -1;  
-    auto animate = Animate::create(animation);
-    auto repeatAnimation = RepeatForever::create(animate);
-
-    //设置标签便于后续停止动作
-    repeatAnimation->setTag(1); 
-    this->runAction(repeatAnimation);
-
-    
-    this->stopActionByTag(1);  //停止动作
-   
-    //计时器，每1秒进行一次update
-    //schedule(CC_SCHEDULE_SELECTOR(TowerShit::update),1.0f);
-
+    //如果目标存在，每0.4秒攻击一次
+    schedule(CC_SCHEDULE_SELECTOR(TowerShit::AttackTarget), 1.0f);
    
     return true;
 }
+
+
 
 /*被点击显示范围和等级界面*/
 void TowerShit::Show_RangeAndGrade(Node* node,int money)
@@ -159,10 +153,69 @@ void TowerShit::Upgrade(Node* node)
   
 }
 
-/*便便塔的攻击*/
-void TowerShit::attack(Node* node)
+/*更新攻击目标*/
+void TowerShit::checkAtkTarget(float dt)
 {
-  
+    //auto node = this->getChildByName("Target");
+   // FlyMonster* target = static_cast<FlyMonster*>(node);
+
+    //获取范围
+    auto Range = Sprite::create("/Theme/Tower/AttackRange.png");
+    Range->setScale(level * 0.5 + 1);
+
+    //对于当前选择的目标，要判断他是否在范围内
+    if (target != nullptr) {
+        float x = this->getPosition().x;
+        float y = this->getPosition().y;
+
+        float x1 = target->getPosition().x;
+        float y1 = target->getPosition().y;
+
+        float d = sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
+
+        //如果当前目标出了范围
+        if (d > Range->getContentSize().height / 2) {
+            target = nullptr;
+        }
+
+        //如果攻击目标挂了，需要更换目标
+        if (target->getHp() <= 0)
+            target = nullptr;
+    }
+
+
+    //如果当前没有目标，在怪兽序列中寻找目标
+    if (target == nullptr) {
+        for (int i = 0; i < m.size(); i++) 
+            if (m[i] != nullptr) {
+
+                FlyMonster* monster = m[i];
+
+                //获取位置信息
+                float x = this->getPosition().x;
+                float y = this->getPosition().y;
+
+                float x1 = monster->getPosition().x;
+                float y1 = monster->getPosition().y;
+
+                //求怪物和塔之间的距离
+                float d = sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
+
+                //如果在范围内，则将其设置为目标
+                if (d <= Range->getContentSize().height / 2) {
+                    target = monster;
+                    return;
+                }
+            }
+    }
+
+
+}
+
+/*便便塔的攻击特效*/
+void TowerShit::attack(Node* node, cocos2d::Vec2 start, cocos2d::Vec2 end)
+{
+
     //获取炮塔所在的位置
     int x = this->getPosition().x;
     int y = this->getPosition().y;
@@ -171,31 +224,95 @@ void TowerShit::attack(Node* node)
     int i = 6 - (y / 80);
     int j = (x / 80);
 
+    //计算需要旋转的度数
+    float dx, dy, r;
+    dx = end.x - start.x;
+    dy = end.y - start.y;
+    r = -atan2f(dy, dx) / 3.14159 * 180;
+
+
+    auto atk_Effect = Sprite::create();
+    atk_Effect->setPosition(Vec2(j*80+40,(6-i)*80+40));
+    node->addChild(atk_Effect);
+
+    auto hide = CallFunc::create([=]() {
+        this->setVisible(0);
+        });
+    auto unhide = CallFunc::create([=]() {
+        this->setVisible(1);
+        });
+    auto remove_atk_Effect = CallFunc::create([=]() {
+        atk_Effect->removeFromParent();
+        });
+   
+    /*-------------------------------炮塔动作效果--------------------------------*/
+
+    //根据不同的等级选择不同的帧动画
+    Vector<SpriteFrame*> frame;
+    switch (level) {
+        case 0:
+            frame.pushBack(SpriteFrame::create("/Theme/Shit/SmallShit.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Shit/SmallShit3.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Shit/SmallShit2.png", Rect(0, 0, 70, 70)));
+            break;
+        case 1:
+            frame.pushBack(SpriteFrame::create("/Theme/Shit/MediumShit.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Shit/MediumShit3.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Shit/MediumShit2.png", Rect(0, 0, 70, 70)));
+            break;
+        case 2:
+            frame.pushBack(SpriteFrame::create("/Theme/Shit/BigShit.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Shit/BigShit3.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Shit/BigShit2.png", Rect(0, 0, 70, 70)));
+            break;
+
+
+    }
+    atk_Effect->runAction(Sequence::create(hide,Animate::create(Animation::createWithSpriteFrames(frame, 0.25)),unhide, remove_atk_Effect, nullptr));
+   
+
+
+    /*-------------------------------子弹效果----------------------------------*/
+
     //飞史效果
     auto TowerShit_attack = Sprite::create("/Theme/Shit/BigShitAttack.png");
     TowerShit_attack->setPosition(Vec2(j * 80 + 40, (6 - i) * 80 + 40));
     node->addChild(TowerShit_attack);
+    TowerShit_attack->setRotation(r+20);  //设置角度旋转
 
-    MoveTo* move1 = MoveTo::create(0.4, Vec2(j * 80 + 200, (6 - i) * 80 + 40)); 
-    auto sequence1 = Sequence::create(FadeIn::create(0.05),move1, FadeOut::create(0.05), nullptr);
+    //移除事件
+    auto remove_bullet = CallFunc::create([=]() {
+        node->removeChild(TowerShit_attack);
+        });
+ 
+
+    MoveTo* move1 = MoveTo::create(1, end); 
+    auto sequence1 = Sequence::create(FadeIn::create(0.05),move1, FadeOut::create(0.05), remove_bullet, nullptr);
     TowerShit_attack->runAction(sequence1);
+
 
     //击中炸史效果
     auto ShitHit = Sprite::create("/Theme/Shit/ShitHit.png");
-    ShitHit->setPosition(Vec2(j * 80 + 200, (6 - i) * 80 + 40));
+    ShitHit->setPosition(end);
     node->addChild(ShitHit);
 
     auto sequence2 = Sequence::create(FadeOut::create(0),DelayTime::create(0.4), FadeIn::create(0.1), DelayTime::create(0.3), FadeOut::create(0.1), FadeOut::create(0.1), nullptr);
     ShitHit->runAction(sequence2);
 
     
-
-
 }
 
-
-void TowerShit::update(float dt)
+/*攻击目标*/
+void TowerShit::AttackTarget(float dt)
 {
-    
-}
+    //auto node1 = this->getChildByName("Target");
+    //FlyMonster* target = static_cast<FlyMonster*>(node1);
 
+    auto node2 = this->getChildByName("Scene");
+
+
+    //如果目标存在，则对其进行攻击
+    if (target != nullptr) {
+        attack(se,this->getPosition(),target->getPosition());
+    }
+}

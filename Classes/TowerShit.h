@@ -4,9 +4,11 @@
 
 #include "cocos2d.h"
 
+USING_NS_CC;
 class TowerShit : public cocos2d::Sprite
 {
 
+	
 
 public:
 
@@ -18,8 +20,7 @@ public:
 	int AttackSpace = 2;//攻击间隔
 	
 	int range_is_visible = 0; //初始范围和升级、出售界面不可见
-
-
+	
 
 	//创建精灵
     static Sprite* createSprite();
@@ -39,13 +40,14 @@ public:
 	//升级
 	void Upgrade(Node* node);
 
-	//监测攻击范围内有敌人时攻击传入怪物地图
-	void attack(Node* node);
+	//一次攻击
+    void attack(Node* node,cocos2d::Vec2 start , cocos2d::Vec2 end);
 
-	void TowerShit::showSprite();
+	//有目标的情况下攻击
+    void AttackTarget(float dt);  
 
-	virtual void update(float dt);
-
+	//选择攻击对象
+	void checkAtkTarget(float dt);
 
 };
 #endif /* defined(__CarrotFantasy__TowerShit__) */

@@ -9,6 +9,7 @@ const int Row_Size = 7;      //纵向7个格子
 const int Total_Wave_Number = 15;    //总共的波数
 const int Monster_Number = 3;      //每波有几只怪物
 
+USING_NS_CC;
 
 //点位种类读取读取：x/100==检测值
 //点位种类赋予：x=赋值
@@ -34,7 +35,6 @@ const int Monster_Number = 3;      //每波有几只怪物
 //针对界面中的Tag
 //对不同类型的node再地图上的标签，我们采用加1000的方式来区分开来
 //i*100+j+5000为一级便便塔  
-
 
 
 //表示第i列第j行的格子
@@ -129,10 +129,13 @@ public:
     void updateMoney(float dt);
 
     //实时更新波数
-    void updateWave(float);
+    void updateWave(float dt);
 
-    //实时更新波数
-    void updateMonster(float);
+    //实时产生怪物
+    void updateMonster(float dt);
+
+    //监测活着的怪物
+    void AliveMonster(float dt);
 
     //每0.2秒监测一次是否有怪物到达终点，吃到萝卜
     void If_Attack_Carrot(float dt);

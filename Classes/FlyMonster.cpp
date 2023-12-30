@@ -1,8 +1,5 @@
 
 #include "FlyMonster.h"
-#include "ui/CocosGUI.h"
-USING_NS_CC;
-using  namespace ui;
 
 
 Sprite* FlyMonster::createSprite()
@@ -11,6 +8,11 @@ Sprite* FlyMonster::createSprite()
     return FlyMonster::create();
 }
 
+/*获取怪物的血量*/
+int FlyMonster::getHp() 
+{
+    return Hp;
+}
 
 bool FlyMonster::init()
 {
@@ -46,7 +48,7 @@ bool FlyMonster::init()
     
     Move(Route,18);
     
-    Hp = 100;
+   
 
     //创建生命值血条
     auto HpBarBG = Sprite::create("/Monster/BloodBarBg.png");
@@ -150,13 +152,17 @@ void FlyMonster::Move(Position p[],int num)
     }
     auto delay=DelayTime::create(delaytime);
     //auto move1 = MoveTo::create(3, Vec2(origin.x + x, origin.y + y));
+     //移除事件
+    auto remove_monster = CallFunc::create([=]() {
+        this->removeFromParent();
+        });
 
     //移动，到达终点后淡出
     auto sequence = Sequence::create(delay,move[1],move[2],move[3],move[4],move[5],move[6],
         move[7],move[8],move[9],move[10],move[11],move[12],move[13],move[14],move[15],
-        move[16],move[17], FadeOut::create(0.05), nullptr);
+        move[16],move[17], FadeOut::create(0.05), remove_monster, nullptr);
 
-    this->runAction(RepeatForever::create(sequence));
+    this->runAction(sequence);
 
    
     //int i = 6 - (this->getPosition().y / 80);

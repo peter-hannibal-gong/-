@@ -9,8 +9,8 @@ class FlyMonster : public cocos2d::Sprite
 {
 public:
 
-	int speed = 110;
-	int Hp;
+	int speed = 70;
+	int Hp=100;
 	int ATK = 1;  //怪物的攻击值
 	int value = 14; //击杀怪物获得的钱
 	float delaytime;
@@ -28,6 +28,9 @@ public:
 	void Init_Route(Position p[]);   //初始化路径
 
 	void updateHp(float dt);  //更新血量
+
+	int getHp() ; //获取血量
+
 
 
 };

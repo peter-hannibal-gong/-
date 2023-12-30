@@ -6,13 +6,15 @@
 #include "TowerShit.h"
 #include"MonsterFactory.h"
 #include"carrot.h"
-USING_NS_CC;
+#include<vector>
+
 
 //暂时存储要进行操作的位置
 int gchx = -1;
 int gchy = -1;
-
 int TowerType;
+std::vector <FlyMonster*> m;  //用于存放怪物
+Scene* se; //保存当前的场景
 /*创建舞台*/
 Scene* Scene1::createScene()
 {
@@ -51,7 +53,7 @@ bool Scene1::init()
     //原点位置
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-
+    se = this;
 
     //添加背景
     auto background = Sprite::create("/Theme/Theme1/background.png"); 
@@ -321,7 +323,13 @@ bool Scene1::init()
     //每1秒出现一只怪物 
     schedule(CC_SCHEDULE_SELECTOR(Scene1::updateMonster), 1.0f);
     
+    //监测是否有怪物到达萝卜处吃掉萝卜
+    schedule(CC_SCHEDULE_SELECTOR(Scene1::If_Attack_Carrot), 0.2f);
+
+    //监测活着的怪物
+    schedule(CC_SCHEDULE_SELECTOR(Scene1::AliveMonster), 0.2f);
    
+    
     return true;
 }
 
@@ -367,16 +375,19 @@ void Scene1::updateWave(float dt)
 void Scene1::updateMonster(float dt)
 {
   
-    //定义一个怪物工厂
+    //定义一个怪物工厂，用于产生怪物
     MonsterFactory p;
 
     //通过数组位置保存的怪物类型，生成相应类型的怪物
-    Sprite* Monster = p.Produce_Monster(Monster_Wave[wave-1][Monster_Order]);
+    Sprite* sp = p.Produce_Monster(Monster_Wave[wave - 1][Monster_Order]);
+    FlyMonster* Monster = dynamic_cast<FlyMonster*>(sp);
 
     this->addChild(Monster);
 
+    //将怪物放入vector数组中
+    m.push_back(Monster);
   
-
+    //当前这只怪在当前波的序号
     Monster_Order = (Monster_Order + 1) % Monster_Number;
 
     //当进行到最后一波的最后一只怪物的时候,停止计数
@@ -389,7 +400,19 @@ void Scene1::updateMonster(float dt)
 //监测是否有怪物到达终点，吃到萝卜
 void Scene1::If_Attack_Carrot(float dt)
 {
-   
+    
+
+}
+
+//实时更新怪物是否死亡
+void Scene1::AliveMonster(float dt)
+{
+    for (int i = 0; i < m.size(); i++) {
+        //如果怪物已经死亡，则将他从数组中删除
+        if (m[i]->getHp() <= 0)
+            m.erase(m.begin()+i);         
+    }
+
 }
 
 void Scene1::gch_onMouseDown(Event* event)
@@ -594,6 +617,8 @@ void Scene1::gch_onMouseDown(Event* event)
                 Shit_Tower->setPosition(Vec2(x1, y1));
                 //Shit_Tower->setTag(x1 * 10000 + y1 * 100);
                 this->addChild(Shit_Tower);
+
+             
             }
 
         }
@@ -615,7 +640,7 @@ void Scene1::gch_onMouseDown(Event* event)
                 if (money >= Tower->upgradecost[Tower->level]) { //钱够
                     //升级，更换塔的形象
                     Tower->Upgrade(this);
-                    Tower->attack(this);
+                    Tower->attack(this,Tower->getPosition(),Vec2(100,100));
                     //扣钱
                     money = money - Tower->upgradecost[Tower->level];
                 }

@@ -8,15 +8,16 @@ Sprite* MonsterFactory::Produce_Monster(int type)
 {
 	Sprite* Monster;
 
+	//测试先都生产flymonster
 	switch (type) {
 		case 0:
 			Monster = FlyMonster::createSprite();
 			break;
 		case 1:
-			Monster = PinkMonster::createSprite();
+			Monster = FlyMonster::createSprite();
 			break;
 		case 2:
-			Monster = GreenMonster::createSprite();
+			Monster = FlyMonster::createSprite();
 			break;
 	}
 		
