@@ -4,6 +4,7 @@
 #include"PinkMonster.h"
 #include"GreenMonster.h"
 #include "TowerShit.h"
+#include"TowerBottle.h"
 #include"MonsterFactory.h"
 #include"carrot.h"
 #include<vector>
@@ -15,6 +16,8 @@ int gchy = -1;
 int TowerType;
 std::vector <FlyMonster*> m;  //用于存放怪物
 Scene* se; //保存当前的场景
+int type_monster = 1;  //当前要生产的怪物类型
+
 /*创建舞台*/
 Scene* Scene1::createScene()
 {
@@ -308,8 +311,8 @@ bool Scene1::init()
     //auto flymonster = FlyMonster::createSprite();
     //this->addChild(flymonster, 2);
 
-    auto pinkmonster = PinkMonster::createSprite();
-    this->addChild(pinkmonster,2);
+    //auto pinkmonster = PinkMonster::createSprite();
+    //this->addChild(pinkmonster,2);
 
     //auto greenmonster = GreenMonster::createSprite();
     //this->addChild(greenmonster,2);
@@ -379,9 +382,11 @@ void Scene1::updateMonster(float dt)
     MonsterFactory p;
 
     //通过数组位置保存的怪物类型，生成相应类型的怪物
+    type_monster = Monster_Wave[wave - 1][Monster_Order];
     Sprite* sp = p.Produce_Monster(Monster_Wave[wave - 1][Monster_Order]);
     FlyMonster* Monster = dynamic_cast<FlyMonster*>(sp);
 
+    
     this->addChild(Monster);
 
     //将怪物放入vector数组中
@@ -407,16 +412,17 @@ void Scene1::If_Attack_Carrot(float dt)
 //实时更新怪物是否死亡
 void Scene1::AliveMonster(float dt)
 {
-    for (int i = 0; i < m.size(); i++) {
-        //如果怪物已经死亡，则将他从数组中删除
-        if (m[i]->getHp() <= 0)
-            m.erase(m.begin()+i);         
-    }
-
+    for (int i = 0; i < m.size(); i++)  
+        if (m[i]->getHp() <= 0 && m[i]->survival==1) {    //如果怪物的血量小于等于0，将其存活状态变成0
+            money = money + m[i]->getValue();   //加钱
+            m[i]->survival = 0;                 //存活状态变成0
+        }
+    
 }
 
 void Scene1::gch_onMouseDown(Event* event)
 {
+
     //获取事件
     EventMouse* e = (EventMouse*)event;
 
@@ -447,11 +453,20 @@ void Scene1::gch_onMouseDown(Event* event)
         gchx = p.i;
         gchy = p.j;   //保存当前塔的位置
         return;
-    }
-   
+    } 
     //点击瓶子
     else if (grid_is_visible == 0 && range_is_visible == 0 && Map1[p.i][p.j] / 100 == Bottle) {
         //瓶子升级界面
+
+        //通过tag获取点击的炮塔对象
+        Node* node = this->getChildByTag(p.i * 100 + p.j + 11000);
+        TowerBottle* Tower = static_cast<TowerBottle*>(node);
+        Tower->Show_RangeAndGrade(this, money);
+
+        range_is_visible = 1;
+        TowerType = Bottle; //当前显示范围的炮塔为便便
+        gchx = p.i;
+        gchy = p.j;   //保存当前塔的位置
         return;
     }
 
@@ -581,8 +596,14 @@ void Scene1::gch_onMouseDown(Event* event)
                 Map1[gchx][gchy] = Bottle1;
                 gchx = -1;
                 gchy = -1;
+
+                //建造便便炮塔
+                auto Bottle_Tower = TowerBottle::createSprite();
+
+                //设置该塔的标签
+                Bottle_Tower->setTag(100 * i1 + j1 + 11000);
                 //建造瓶子炮塔
-                auto Bottle_Tower = Sprite::create("Theme/Bottle/SmallBottle.png");
+             
                 Bottle_Tower->setPosition(Vec2(x1, y1));
                 //Bottle_Tower->setTag(x1 * 1000 + y1 * 10);
                 this->addChild(Bottle_Tower);
@@ -629,34 +650,83 @@ void Scene1::gch_onMouseDown(Event* event)
         Tower2->setVisible(false);
     }
     //场上有攻击范围显示和升级界面
-    else if (range_is_visible==1) {
+    else if (range_is_visible == 1) {
 
+        int f = 1;  //判断是否卖出
         if (TowerType == Shit) {
             Node* node = this->getChildByTag(gchx * 100 + gchy + 5000);
             TowerShit* Tower = static_cast<TowerShit*>(node);
-            
+
             //若按下的位置在升级位置
-            if ((x >= gchy * 80 && x <= gchy * 80 + 80 && y >= (6 - gchx) * 80+80  && y <= (6 - gchx) * 80 + 160)) {
+            if ((x >= gchy * 80 && x <= gchy * 80 + 80 && y >= (6 - gchx) * 80 + 80 && y <= (6 - gchx) * 80 + 160)) {
                 if (money >= Tower->upgradecost[Tower->level]) { //钱够
                     //升级，更换塔的形象
                     Tower->Upgrade(this);
-                    Tower->attack(this,Tower->getPosition(),Vec2(100,100));
+                    //Tower->attack(this, Tower->getPosition(), Vec2(100, 100));
                     //扣钱
                     money = money - Tower->upgradecost[Tower->level];
                 }
-                
+
+            }//若按下的位置在出售位置
+            else if ((x >= gchy * 80 && x <= gchy * 80 + 80 && y >= (6 - gchx) * 80 - 80 && y <= (6 - gchx) * 80)) {
+                //加钱
+                money = money + Tower->value[Tower->level];
+                //删除该炮塔
+                //Node* node = static_cast<Node*>(Tower);
+                Tower->stopschedule();
+                Tower->Hide_RangeAndGrade(this);  //取消显示范围要在删除之前
+                Tower->removeFromParent();
+                f = 0;
+                //Tower->setVisible(false);
+                //delete Tower;
+                Map1[gchx][gchy] = EMPTY;
             }
-            Tower->Hide_RangeAndGrade(this);
+            if (f)
+                Tower->Hide_RangeAndGrade(this);
+
+            //点击完成后范围不可见
+            range_is_visible = 0;
         }
-            
-        //点击完成后范围不可见
-        range_is_visible = 0;
+        if (TowerType == Bottle) {
+            Node* node = this->getChildByTag(gchx * 100 + gchy + 11000);
+            TowerBottle* Tower = static_cast<TowerBottle*>(node);
+
+            //若按下的位置在升级位置
+            if ((x >= gchy * 80 && x <= gchy * 80 + 80 && y >= (6 - gchx) * 80 + 80 && y <= (6 - gchx) * 80 + 160)) {
+                if (money >= Tower->upgradecost[Tower->level]) { //钱够
+                    //升级，更换塔的形象
+                    Tower->Upgrade(this);
+                    //Tower->attack(this, Tower->getPosition(), Vec2(100, 100));
+                    //扣钱
+                    money = money - Tower->upgradecost[Tower->level];
+                }
+
+            }//若按下的位置在出售位置
+            else if ((x >= gchy * 80 && x <= gchy * 80 + 80 && y >= (6 - gchx) * 80 - 80 && y <= (6 - gchx) * 80)) {
+                //加钱
+                money = money + Tower->value[Tower->level];
+                //删除该炮塔
+                //Node* node = static_cast<Node*>(Tower);
+                Tower->stopschedule();
+                Tower->Hide_RangeAndGrade(this);  //取消显示范围要在删除之前
+                Tower->removeFromParent();
+                f = 0;
+                //Tower->setVisible(false);
+                //delete Tower;
+                Map1[gchx][gchy] = EMPTY;
+            }
+            if (f)
+                Tower->Hide_RangeAndGrade(this);
+
+            //点击完成后范围不可见
+            range_is_visible = 0;
+        }
     }
     else {
-        auto lllzty = Sprite::create("grossini.png");
-        lllzty->setPosition(Vec2(100, 100));
-        this->addChild(lllzty,3);
-    }
+            auto lllzty = Sprite::create("grossini.png");
+            lllzty->setPosition(Vec2(100, 100));
+            this->addChild(lllzty, 3);
+        }
 
     
 }

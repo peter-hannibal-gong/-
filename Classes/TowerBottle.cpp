@@ -1,4 +1,4 @@
-#include "TowerShit.h"
+#include "TowerBottle.h"
 #include "FlyMonster.h"
 #include "Scene1.h"
 #include<vector>
@@ -7,14 +7,13 @@ extern Scene* se;
 static FlyMonster* target=nullptr;
 
 using namespace std;
-Sprite* TowerShit::createSprite()
+Sprite* TowerBottle::createSprite()
 {
 
-    return TowerShit::create();
+    return TowerBottle::create();
 }
 
-
-bool TowerShit::init()
+bool TowerBottle::init()
 {
     if (!Sprite::init()) {
         return false;
@@ -27,26 +26,27 @@ bool TowerShit::init()
     //scene->setName("Scene");
 
     //设置图片
-    this->initWithFile("/Theme/Shit/SmallShit.png");
+    this->initWithFile("/Theme/Bottle/SmallBottle1.png");
     
 
     //每0.2s更新一次攻击目标
-    schedule(CC_SCHEDULE_SELECTOR(TowerShit::checkAtkTarget),1.0f);
+    schedule(CC_SCHEDULE_SELECTOR(TowerBottle::checkAtkTarget),1.0f);
 
     //如果目标存在，每0.4秒攻击一次
-    schedule(CC_SCHEDULE_SELECTOR(TowerShit::AttackTarget), 1.0f);
+    schedule(CC_SCHEDULE_SELECTOR(TowerBottle::AttackTarget), 1.0f);
    
     return true;
 }
 
-void TowerShit::stopschedule()
+/*停止计时器*/
+void TowerBottle::stopschedule()
 {
-    unschedule(CC_SCHEDULE_SELECTOR(TowerShit::checkAtkTarget));
-    unschedule(CC_SCHEDULE_SELECTOR(TowerShit::AttackTarget));
+    unschedule(CC_SCHEDULE_SELECTOR(TowerBottle::checkAtkTarget));
+    unschedule(CC_SCHEDULE_SELECTOR(TowerBottle::AttackTarget));
 }
 
 /*被点击显示范围和等级界面*/
-void TowerShit::Show_RangeAndGrade(Node* node,int money)
+void TowerBottle::Show_RangeAndGrade(Node* node,int money)
 {
     //获取炮塔所在的位置
     int x = this->getPosition().x;
@@ -58,10 +58,10 @@ void TowerShit::Show_RangeAndGrade(Node* node,int money)
 
     //范围显示 
     auto Range = Sprite::create("/Theme/Tower/AttackRange.png");
-    Range->setScale(level*0.5+1);
+    Range->setScale(level*0.7+1);
     Range->setOpacity(150);
     Range->setPosition(Vec2(j * 80 + 40, (6 - i) * 80 + 40));
-    Range->setTag(6000 + 100 * i + j);
+    Range->setTag(12000 + 100 * i + j);
     node->addChild(Range, 2); 
 
     //升级显示
@@ -73,39 +73,39 @@ void TowerShit::Show_RangeAndGrade(Node* node,int money)
             UpLevel = Sprite::create("/Theme/Tower/CantUpLevel.png");
         UpLevel->setPosition(Vec2(j * 80 + 40, (6 - i) * 80 + 120));
         node->addChild(UpLevel, 2);
-        UpLevel->setTag(7000 + 100 * i + j);
+        UpLevel->setTag(13000 + 100 * i + j);
     }
     else {
         auto UpLevel = Sprite::create("/Theme/Tower/ReachHighestLevel.png");
         UpLevel->setPosition(Vec2(j * 80 + 40, (6 - i) * 80 + 120));
         node->addChild(UpLevel, 2);
-        UpLevel->setTag(7000 + 100 * i + j);
+        UpLevel->setTag(14000 + 100 * i + j);
     }
 
     //出售显示
     auto SellTower = Sprite::create("/Theme/Tower/SellTower.png");
     SellTower->setPosition(Vec2(j * 80 + 40, (6 - i) * 80 -40));
     node->addChild(SellTower, 2);
-    SellTower->setTag(8000 + 100 * i + j);
+    SellTower->setTag(15000 + 100 * i + j);
 
     //显示升级所需money
     if (level != 2) { //没有达到最高级
         auto UpLevel_Money = Label::createWithTTF(std::to_string(upgradecost[level + 1]), "fonts/Marker Felt.ttf", 20);
         UpLevel_Money->setPosition(Vec2(j * 80 + 50, (6 - i) * 80 + 95));
         node->addChild(UpLevel_Money, 2);
-        UpLevel_Money->setTag(9000 + 100 * i + j);
+        UpLevel_Money->setTag(16000 + 100 * i + j);
     }
     
     //显示出售money
     auto SellTower_Money = Label::createWithTTF(std::to_string(value[level]), "fonts/Marker Felt.ttf", 20);
     SellTower_Money->setPosition(Vec2(j * 80 + 50, (6 - i) * 80 - 65));
     node->addChild(SellTower_Money, 2);
-    SellTower_Money->setTag(10000 + 100 * i + j);
+    SellTower_Money->setTag(17000 + 100 * i + j);
 
 }
 
 /*隐藏范围和等级界面*/
-void TowerShit::Hide_RangeAndGrade(Node* node)
+void TowerBottle::Hide_RangeAndGrade(Node* node)
 {
 
     //获取炮塔所在的位置
@@ -117,54 +117,53 @@ void TowerShit::Hide_RangeAndGrade(Node* node)
     int j = (x / 80);              
 
     //移除范围显示
-    Node* n1 = node->getChildByTag(6000 + 100 * i + j);
+    Node* n1 = node->getChildByTag(12000 + 100 * i + j);
     Sprite* Range = static_cast<Sprite*>(n1);
     Range->setVisible(false);
     node->removeChild(Range);
 
     //升级显示取消
-    Node* n2 = node->getChildByTag(7000 + 100 * i + j);
+    Node* n2 = node->getChildByTag(13000 + 100 * i + j);
     Sprite* UpLevel = static_cast<Sprite*>(n2);
     node->removeChild(UpLevel);
 
     //出售显示取消
-    Node* n3 = node->getChildByTag(8000 + 100 * i + j);
+    Node* n3 = node->getChildByTag(14000 + 100 * i + j);
     Sprite* SellTower = static_cast<Sprite*>(n3);
     node->removeChild(SellTower);
 
     //显示升级所需money取消
     if (level != 2) { //没有达到最高级(达到最高级原本就没有显示升级所需money)
-        Node* n4 = node->getChildByTag(9000 + 100 * i + j);
+        Node* n4 = node->getChildByTag(15000 + 100 * i + j);
         Label* UpLevel_Money = static_cast<Label*>(n4);
         node->removeChild(UpLevel_Money);
     }
     //显示出售money
-    Node* n5 = node->getChildByTag(10000 + 100 * i + j);
+    Node* n5 = node->getChildByTag(16000 + 100 * i + j);
     Label* SellTower_Money = static_cast<Label*>(n5);
     node->removeChild(SellTower_Money);
 
 }
 
 /*给塔升级，更新塔的图片*/
-void TowerShit::Upgrade(Node* node)
+void TowerBottle::Upgrade(Node* node)
 {
     level++;
 
     if (level == 1)
-        this->setTexture("/Theme/Shit/MediumShit.png");
+        this->setTexture("/Theme/Bottle/MediumBottle1.png");
     else  if (level == 2)
-        this->setTexture("/Theme/Shit/BigShit.png");
+        this->setTexture("/Theme/Bottle/BigBottle1.png");
   
 }
 
 /*更新攻击目标*/
-void TowerShit::checkAtkTarget(float dt)
+void TowerBottle::checkAtkTarget(float dt)
 {
    
-
     //获取范围
     auto Range = Sprite::create("/Theme/Tower/AttackRange.png");
-    Range->setScale(level * 0.5 + 1);
+    Range->setScale(level * 0.5 + 1.2);
     //Node* n1 = se->getChildByTag(6000 + 100 * i + j);
     //Sprite* Range = static_cast<Sprite*>(n1);
 
@@ -211,11 +210,9 @@ void TowerShit::checkAtkTarget(float dt)
             }
     }
 
-
 }
-
-/*便便塔的攻击特效*/
-void TowerShit::attack(Node* node, cocos2d::Vec2 start, cocos2d::Vec2 end)
+/*瓶子塔的攻击特效*/
+void TowerBottle::attack(Node* node, cocos2d::Vec2 start, cocos2d::Vec2 end)
 {
 
     //获取炮塔所在的位置
@@ -253,39 +250,40 @@ void TowerShit::attack(Node* node, cocos2d::Vec2 start, cocos2d::Vec2 end)
     Vector<SpriteFrame*> frame;
     switch (level) {
         case 0:
-            frame.pushBack(SpriteFrame::create("/Theme/Shit/SmallShit.png", Rect(0, 0, 70, 70)));
-            frame.pushBack(SpriteFrame::create("/Theme/Shit/SmallShit3.png", Rect(0, 0, 70, 70)));
-            frame.pushBack(SpriteFrame::create("/Theme/Shit/SmallShit2.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Bottle/SmallBottle2.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Bottle/SmallBottle3.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Bottle/SmallBottle1.png", Rect(0, 0, 70, 70)));
             break;
         case 1:
-            frame.pushBack(SpriteFrame::create("/Theme/Shit/MediumShit.png", Rect(0, 0, 70, 70)));
-            frame.pushBack(SpriteFrame::create("/Theme/Shit/MediumShit3.png", Rect(0, 0, 70, 70)));
-            frame.pushBack(SpriteFrame::create("/Theme/Shit/MediumShit2.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Bottle/MediumBottle2.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Bottle/MediumBottle3.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Bottle/MediumBottle1.png", Rect(0, 0, 70, 70)));
             break;
         case 2:
-            frame.pushBack(SpriteFrame::create("/Theme/Shit/BigShit.png", Rect(0, 0, 70, 70)));
-            frame.pushBack(SpriteFrame::create("/Theme/Shit/BigShit3.png", Rect(0, 0, 70, 70)));
-            frame.pushBack(SpriteFrame::create("/Theme/Shit/BigShit2.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Bottle/BigBottle2.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Bottle/BigBottle3.png", Rect(0, 0, 70, 70)));
+            frame.pushBack(SpriteFrame::create("/Theme/Bottle/BigBottle1.png", Rect(0, 0, 70, 70)));
             break;
 
     }
+    atk_Effect->setRotation(r);
     atk_Effect->runAction(Sequence::create(DelayTime::create(0.1f),hide,Animate::create(Animation::createWithSpriteFrames(frame, 0.25)),unhide, remove_atk_Effect, nullptr));
    
 
 
     /*-------------------------------子弹效果----------------------------------*/
 
-    //飞史效果
+    //飞弹效果
     Sprite* TowerShit_attack;
     switch (level) {
         case 0:
-            TowerShit_attack = Sprite::create("/Theme/Shit/SmallShitAttack.png");
+            TowerShit_attack = Sprite::create("/Theme/Bottle/SmallBottleBullet.png");
             break;
         case 1:
-            TowerShit_attack = Sprite::create("/Theme/Shit/MediumShitAttack.png");
+            TowerShit_attack = Sprite::create("/Theme/Bottle/MediumBottleBullet.png");
             break;
         case 2:
-            TowerShit_attack = Sprite::create("/Theme/Shit/BigShitAttack.png");
+            TowerShit_attack = Sprite::create("/Theme//Bottle/BigBottleBullet.png");
             break;
 
 
@@ -302,13 +300,13 @@ void TowerShit::attack(Node* node, cocos2d::Vec2 start, cocos2d::Vec2 end)
         });
  
 
-    MoveTo* move1 = MoveTo::create(1, end); 
+    MoveTo* move1 = MoveTo::create(0.6, end); 
     auto sequence1 = Sequence::create(DelayTime::create(0.1f),FadeIn::create(0.05),move1, FadeOut::create(0.05), remove_bullet, nullptr);
     TowerShit_attack->runAction(sequence1);
 
 
     //击中炸史效果
-    auto ShitHit = Sprite::create("/Theme/Shit/ShitHit.png");
+    auto ShitHit = Sprite::create("/Theme/Bottle/BottleHit.png");
     ShitHit->setPosition(end);
     node->addChild(ShitHit);
 
@@ -319,7 +317,7 @@ void TowerShit::attack(Node* node, cocos2d::Vec2 start, cocos2d::Vec2 end)
 }
 
 /*攻击目标*/
-void TowerShit::AttackTarget(float dt)
+void TowerBottle::AttackTarget(float dt)
 {
     //auto node1 = this->getChildByName("Target");
     //FlyMonster* target = static_cast<FlyMonster*>(node1);

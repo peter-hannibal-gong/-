@@ -1,21 +1,18 @@
 
-#ifndef __CarrotFantasy__TowerShit__
-#define __CarrotFantasy__TowerShit__
+#ifndef __CarrotFantasy__TowerBottle__
+#define __CarrotFantasy__TowerBottle__
 
 #include "cocos2d.h"
 
 USING_NS_CC;
-class TowerShit : public cocos2d::Sprite
+class TowerBottle : public cocos2d::Sprite
 {
-
-	
-
 public:
 
 	int level = 0;  //塔的等级,分别为0、1、2级
-	int value[3] = {96,272,480};  //塔的价值（卖出获得的钱）
-	int upgradecost[3] = {120,220,260 }; //建造和升级塔的
-	int ATK[3] = { 10,20,30 };
+	int value[3] = {80,224,432};  //塔的价值（卖出获得的钱）
+	int upgradecost[3] = {100,180,260 }; //建造和升级塔的
+	int ATK[3] = { 20,40,55};
 
 	//int AttackRange = 200; //攻击范围，一级塔的攻击范围为200
 	//int AttackSpace = 2;//攻击间隔
@@ -30,7 +27,7 @@ public:
 	virtual bool init();
 
 	//宏定义
-	CREATE_FUNC(TowerShit);
+	CREATE_FUNC(TowerBottle);
 
 	//被点击显示范围和等级界面
 	void Show_RangeAndGrade(Node* node,int money);
@@ -54,4 +51,4 @@ public:
 	void stopschedule();
 
 };
-#endif /* defined(__CarrotFantasy__TowerShit__) */
+#endif /* defined(__CarrotFantasy__TowerBottle__) */

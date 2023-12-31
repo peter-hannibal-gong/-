@@ -34,8 +34,8 @@ USING_NS_CC;
 
 //针对界面中的Tag
 //对不同类型的node再地图上的标签，我们采用加1000的方式来区分开来
-//i*100+j+5000为一级便便塔  
-
+//i*100+j+5000为便便塔   6000为范围显示   7000为升级显示  8000为出售显示   9000为升级所需money显示   10000为出售所需money显示
+//i*100+j+11000为瓶子塔   12000为范围显示   13000为升级显示  14000为出售显示   15000为升级所需money显示   16000为出售所需money显示
 
 //表示第i列第j行的格子
 struct Position  
@@ -49,7 +49,7 @@ class Scene1 : public cocos2d::Scene
 private:
     
 
-    int money=450; //初始拥有的钱
+    int money=1000; //初始拥有的钱
     int wave = 1;  //当前的波数
     int Monster_Order = 0;  //当前产生的怪物的在一波中的次序
 
@@ -65,7 +65,7 @@ public:
 
     Position Start_Place;
     Position End_Place;
-    Position Route[18];
+  
 
 
     //第一关地图,表示哪些地方可以放置炮塔

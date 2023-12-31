@@ -14,6 +14,13 @@ int FlyMonster::getHp()
     return Hp;
 }
 
+/*获取价值*/
+int FlyMonster::getValue()
+{
+    return value;
+}
+
+/*初始化*/
 bool FlyMonster::init()
 {
     if (!Sprite::init()) {
@@ -49,7 +56,6 @@ bool FlyMonster::init()
     Move(Route,18);
     
    
-
     //创建生命值血条
     auto HpBarBG = Sprite::create("/Monster/BloodBarBg.png");
     HpBarBG->setPosition(Vec2(getContentSize().width / 2+55, getContentSize().height / 2+90));
@@ -75,17 +81,6 @@ bool FlyMonster::init()
 /*初始化路径*/
 void FlyMonster::Init_Route(Position p[])
 {
-
-    int Map1[Row_Size][Column_Size] =
-    {
-    {0,0,0,1,1,1,1,1,1,0,0,0},
-    {0,1,0,1,1,1,1,1,1,0,1,0},
-    {0,1,0,0,1,0,0,1,0,0,1,0},
-    {0,1,1,0,1,1,1,1,0,1,1,0},
-    {0,1,1,1,1,1,1,1,1,1,1,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0},
-    {1,1,0,0,0,0,0,0,0,0,1,1} };
-
 
     p[0].i = 1; p[0].j = 1;
 
@@ -177,13 +172,26 @@ void FlyMonster::Move(Position p[],int num)
 void FlyMonster::updateHp(float dt)
 {
 
-    Hp = Hp - 15;
+    //Hp = Hp - 15;
     if (Hp <= 0) {
         unschedule(CC_SCHEDULE_SELECTOR(FlyMonster::update));
         this->setVisible(false);
         //removeFromParent();//让怪消失
     }
-    BloodBar->setPercentage(float(Hp));
+    BloodBar->setPercentage(float(Hp)/70*100);
+}
+
+/*扣血*/
+void FlyMonster::takedamage(int damage)
+{
+    Hp -= damage;
+}
+
+/*获取存货状态*/
+bool FlyMonster::getalive()
+{
+    return survival;
+
 }
 
 

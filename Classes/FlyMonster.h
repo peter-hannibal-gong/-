@@ -10,10 +10,11 @@ class FlyMonster : public cocos2d::Sprite
 public:
 
 	int speed = 70;
-	int Hp=100;
+	int Hp=70;
 	int ATK = 1;  //怪物的攻击值
 	int value = 14; //击杀怪物获得的钱
 	float delaytime;
+	int survival = 1;
 
 	ProgressTimer* BloodBar;
 
@@ -31,7 +32,12 @@ public:
 
 	int getHp() ; //获取血量
 
+	int getValue();  //获取价值
+	
+	void takedamage(int damage); //被攻击扣血
 
+	bool getalive();
 
 };
+
 #endif /* defined(__CarrotFantasy__FlyMonster__) */
