@@ -32,7 +32,7 @@ bool Helperb::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
     //∑≈÷√±≥æ∞Õº
-    auto mainbackground = Sprite::create("/NestScene/help_3-hd_bg.png");
+    auto mainbackground = Sprite::create("/HelperScene/help_3-hd_bg.png");
     if (mainbackground == nullptr)   //’“≤ªµΩ∏√Õº∆¨
     {
         problemLoading("'mainbackground.png'");

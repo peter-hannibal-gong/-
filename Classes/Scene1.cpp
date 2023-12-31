@@ -50,6 +50,8 @@ bool Scene1::init()
     {
         return false;
     }
+    //清空保存怪物的vector数组
+    m.clear();   
 
     //获取分辨率（窗口大小）
     auto visibleSize = Director::getInstance()->getVisibleSize(); 

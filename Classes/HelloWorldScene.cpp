@@ -3,7 +3,6 @@
 #include "HelloWorldScene.h"
 #include "ui/CocosGUI.h"
 
-
 #include"TowerShit.h"
 #include"FlyMonster.h"
 USING_NS_CC;
@@ -135,7 +134,7 @@ bool HelloWorld::init()
 
 
 
-    auto flymonster=FlyMonster::createSprite();
+    auto flymonster=FlyMonster::create();
     //shit->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 3 + origin.y));
     this->addChild(flymonster,0);
 
