@@ -1,17 +1,19 @@
-#include "MenuScene.h"
+ï»¿#include "MenuScene.h"
 #include "Scene1.h"
 #include"MapChooseScene.h"
 #include"Setting.h"
+#include "Helper.h"
+#include "music.h"
 #include<string>
 USING_NS_CC;
 
-/*´´½¨³¡¾°*/
+/*åˆ›å»ºåœºæ™¯*/
 Scene* MenuScene::createScene()
 {
     return MenuScene::create();
 }
 
-/*´íÎó´¦Àí*/
+/*é”™è¯¯å¤„ç†*/
 static void problemLoading(const char* filename)
 {
     printf("Error while loading: %s\n", filename);
@@ -19,338 +21,338 @@ static void problemLoading(const char* filename)
 }
 
 
-/*³õÊ¼»¯³¡¾°*/
+/*åˆå§‹åŒ–åœºæ™¯*/
 bool MenuScene::init()
 {
   
-    if (!Scene::init())  //³õÊ¼»¯³¡¾°
+    if (!Scene::init())  //åˆå§‹åŒ–åœºæ™¯
     {
         return false;
     }
 
-    auto visibleSize = Director::getInstance()->getVisibleSize();  //»ñÈ¡·Ö±æÂÊ£¨´°¿Ú´óÐ¡£©
+    auto visibleSize = Director::getInstance()->getVisibleSize();  //èŽ·å–åˆ†è¾¨çŽ‡ï¼ˆçª—å£å¤§å°ï¼‰
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    //·ÅÖÃ±³¾°Í¼
+    //æ”¾ç½®èƒŒæ™¯å›¾
     auto mainbackground = Sprite::create("/MenuScene/mainbackground.png");
-    if (mainbackground == nullptr)   //ÕÒ²»µ½¸ÃÍ¼Æ¬
+    if (mainbackground == nullptr)   //æ‰¾ä¸åˆ°è¯¥å›¾ç‰‡
     {
         problemLoading("'mainbackground.png'");
     }
     else
     { 
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         mainbackground->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y )); 
 
-        //½«mainbackground¼ÓÈëÕâ¸ö³¡¾°ÖÐ
+        //å°†mainbackgroundåŠ å…¥è¿™ä¸ªåœºæ™¯ä¸­
         this->addChild(mainbackground, 0);   
     }
 
 
-    //·ÅÖÃ´óÔÆ¶ä
+    //æ”¾ç½®å¤§äº‘æœµ
     auto bigcloud = Sprite::create("/MenuScene/bigcloud.png");
-    if (bigcloud == nullptr)   //ÕÒ²»µ½¸ÃÍ¼Æ¬
+    if (bigcloud == nullptr)   //æ‰¾ä¸åˆ°è¯¥å›¾ç‰‡
     {
         problemLoading("'bigcloud.png'");
     }
     else
     {
-        //ÉèÖÃ±ÈÀý
+        //è®¾ç½®æ¯”ä¾‹
         bigcloud->setScale(0.8);
 
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         bigcloud->setPosition(Vec2(origin.x - bigcloud->getContentSize().width,origin.y + visibleSize.height * 0.85)); 
 
-        //ÉèÖÃÍ¸Ã÷¶È
+        //è®¾ç½®é€æ˜Žåº¦
         bigcloud->setOpacity(95);
 
-        //´Ó×óÏòÓÒÆ®µ½½çÃæÍâ
+        //ä»Žå·¦å‘å³é£˜åˆ°ç•Œé¢å¤–
         auto bigcloud_move1 = MoveTo::create(5, Vec2(origin.x + visibleSize.width * 2, origin.y + visibleSize.height * 0.85));
 
-        //»Øµ½Ô­À´Î»ÖÃ
+        //å›žåˆ°åŽŸæ¥ä½ç½®
         auto bigcloud_move2 = MoveTo::create(0, Vec2(origin.x - bigcloud->getContentSize().width, origin.y + visibleSize.height * 0.85));
 
-        //¶¯×÷ÐòÁÐ£¬ÏÈ´Ó×óµ½ÓÒ£¬ÔÝÍ£3s£¬»Øµ½Ô­À´Î»ÖÃ
+        //åŠ¨ä½œåºåˆ—ï¼Œå…ˆä»Žå·¦åˆ°å³ï¼Œæš‚åœ3sï¼Œå›žåˆ°åŽŸæ¥ä½ç½®
         auto bigcloud_sequence = Sequence::create(bigcloud_move1, DelayTime::create(3), bigcloud_move2, nullptr);
 
-        //ÎÞÏÞÑ­»·´óÔÆ¶ä¶¯×÷ÐòÁÐ
+        //æ— é™å¾ªçŽ¯å¤§äº‘æœµåŠ¨ä½œåºåˆ—
         bigcloud->runAction(RepeatForever::create(bigcloud_sequence));
 
-        this->addChild(bigcloud);         //½«bigcloud¼ÓÈëÕâ¸ö³¡¾°ÖÐ
+        this->addChild(bigcloud);         //å°†bigcloudåŠ å…¥è¿™ä¸ªåœºæ™¯ä¸­
 
     }
 
-    //·ÅÖÃÐ¡ÔÆ¶ä
+    //æ”¾ç½®å°äº‘æœµ
     auto smallcloud = Sprite::create("/MenuScene/smallcloud.png");
-    if (smallcloud == nullptr)   //ÕÒ²»µ½¸ÃÍ¼Æ¬
+    if (smallcloud == nullptr)   //æ‰¾ä¸åˆ°è¯¥å›¾ç‰‡
     {
         problemLoading("'smallcloud.png'");
     }
     else
     { 
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         smallcloud->setPosition(Vec2(origin.x - smallcloud->getContentSize().width,origin.y + visibleSize.height * 0.77));
 
-        //ÉèÖÃÍ¸Ã÷¶È
+        //è®¾ç½®é€æ˜Žåº¦
         smallcloud->setOpacity(90); 
       
-        //´Ó×óÏòÓÒÆ®µ½½çÃæÍâ
+        //ä»Žå·¦å‘å³é£˜åˆ°ç•Œé¢å¤–
         auto smallcloud_move2 = MoveTo::create(3, Vec2(origin.x + visibleSize.width*2, origin.y + visibleSize.height * 0.77));
 
-        //»Øµ½Ô­À´Î»ÖÃ
+        //å›žåˆ°åŽŸæ¥ä½ç½®
         auto smallcloud_move1 = MoveTo::create(0, Vec2(origin.x-smallcloud->getContentSize().width, origin.y + visibleSize.height * 0.77));
 
-        //¶¯×÷ÐòÁÐ£¬ÏÈ´Ó×óµ½ÓÒ£¬ÔÝÍ£3s£¬»Øµ½Ô­À´Î»ÖÃ
+        //åŠ¨ä½œåºåˆ—ï¼Œå…ˆä»Žå·¦åˆ°å³ï¼Œæš‚åœ3sï¼Œå›žåˆ°åŽŸæ¥ä½ç½®
         auto smallcloud_sequence = Sequence::create(smallcloud_move1, DelayTime::create(3), smallcloud_move2, nullptr);
 
-        //ÎÞÏÞÑ­»·Ð¡ÔÆ¶ä¶¯×÷ÐòÁÐ
+        //æ— é™å¾ªçŽ¯å°äº‘æœµåŠ¨ä½œåºåˆ—
         smallcloud->runAction(RepeatForever::create(smallcloud_sequence));
 
-        //½«smallcloud¼ÓÈë³¡¾°ÖÐ
+        //å°†smallcloudåŠ å…¥åœºæ™¯ä¸­
         this->addChild(smallcloud);  
     }
 
-    //·ÅÖÃÂÜ²· 
+    //æ”¾ç½®èåœ 
     const int rabbit_leaf_hang_time = 1;
     const int rabbit_leaf_hang_range = 10;
-    //·ÅÖÃ×óÒ¶×Ó
+    //æ”¾ç½®å·¦å¶å­
     auto leaf1 = Sprite::create("/MenuScene/leaf1.png");
-    if (leaf1 == nullptr)   //ÕÒ²»µ½¸ÃÍ¼Æ¬
+    if (leaf1 == nullptr)   //æ‰¾ä¸åˆ°è¯¥å›¾ç‰‡
     {
         problemLoading("leaf1.png'");
     }
     else
     {
         auto leaf1size = leaf1->getContentSize();
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         leaf1->setPosition(Vec2(origin.x + leaf1size.width/2+ visibleSize.width / 2 - 60, origin.y - leaf1size.height/2 + visibleSize.height / 2 + 130));
         
         leaf1->setAnchorPoint(Vec2(1, 0));
-        //´Ó×óÏòÓÒÆ®µ½½çÃæÍâ
+        //ä»Žå·¦å‘å³é£˜åˆ°ç•Œé¢å¤–
         auto leaf1_move1 = RotateTo::create(rabbit_leaf_hang_time, -rabbit_leaf_hang_range);
-        //»Øµ½Ô­À´Î»ÖÃ
+        //å›žåˆ°åŽŸæ¥ä½ç½®
         auto leaf1_move2 = RotateTo::create(rabbit_leaf_hang_time, rabbit_leaf_hang_range);
-        //»Øµ½Ô­À´Î»ÖÃ
+        //å›žåˆ°åŽŸæ¥ä½ç½®
         auto leaf1_move3 = RotateTo::create(rabbit_leaf_hang_time, 0);
-        //¶¯×÷ÐòÁÐ£¬ÏÈ´Ó×óµ½ÓÒ£¬ÔÝÍ£3s£¬»Øµ½Ô­À´Î»ÖÃ
+        //åŠ¨ä½œåºåˆ—ï¼Œå…ˆä»Žå·¦åˆ°å³ï¼Œæš‚åœ3sï¼Œå›žåˆ°åŽŸæ¥ä½ç½®
         auto leaf1_sequence = Sequence::create(leaf1_move1, leaf1_move2, leaf1_move3,DelayTime::create(3), nullptr);
         
-        //ÎÞÏÞÑ­»·Ð¡ÔÆ¶ä¶¯×÷ÐòÁÐ
+        //æ— é™å¾ªçŽ¯å°äº‘æœµåŠ¨ä½œåºåˆ—
         leaf1->runAction(RepeatForever::create(leaf1_sequence));
-        //½«×óÒ¶×Ó¼ÓÈë³¡¾°ÖÐ
+        //å°†å·¦å¶å­åŠ å…¥åœºæ™¯ä¸­
         this->addChild(leaf1);
         
     }
 
-    //·ÅÖÃÓÒÒ¶×Ó
+    //æ”¾ç½®å³å¶å­
     auto leaf2 = Sprite::create("/MenuScene/leaf2.png");
-    if (leaf2 == nullptr)   //ÕÒ²»µ½¸ÃÍ¼Æ¬
+    if (leaf2 == nullptr)   //æ‰¾ä¸åˆ°è¯¥å›¾ç‰‡
     {
         problemLoading("leaf2.png'");
     }
     else
     {   
         auto leaf2size = leaf2->getContentSize();
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         leaf2->setPosition(Vec2(origin.x - leaf2size.width / 2 + visibleSize.width / 2 +90, origin.y - leaf2size.height / 2 + visibleSize.height / 2 + 130));        
 
         leaf2->setAnchorPoint(Vec2(0, 0));
-        //´Ó×óÏòÓÒÆ®µ½½çÃæÍâ
+        //ä»Žå·¦å‘å³é£˜åˆ°ç•Œé¢å¤–
         auto leaf2_move1 = RotateTo::create(rabbit_leaf_hang_time, -rabbit_leaf_hang_range);
-        //»Øµ½Ô­À´Î»ÖÃ
+        //å›žåˆ°åŽŸæ¥ä½ç½®
         auto leaf2_move2 = RotateTo::create(rabbit_leaf_hang_time, rabbit_leaf_hang_range);
-        //»Øµ½Ô­À´Î»ÖÃ
+        //å›žåˆ°åŽŸæ¥ä½ç½®
         auto leaf2_move3 = RotateTo::create(rabbit_leaf_hang_time, 0);
-        //¶¯×÷ÐòÁÐ£¬ÏÈ´Ó×óµ½ÓÒ£¬ÔÝÍ£3s£¬»Øµ½Ô­À´Î»ÖÃ
+        //åŠ¨ä½œåºåˆ—ï¼Œå…ˆä»Žå·¦åˆ°å³ï¼Œæš‚åœ3sï¼Œå›žåˆ°åŽŸæ¥ä½ç½®
         auto leaf2_sequence = Sequence::create(leaf2_move1, leaf2_move2, leaf2_move3, DelayTime::create(3), nullptr);
 
-        //ÎÞÏÞÑ­»·Ð¡ÔÆ¶ä¶¯×÷ÐòÁÐ
+        //æ— é™å¾ªçŽ¯å°äº‘æœµåŠ¨ä½œåºåˆ—
         leaf2->runAction(RepeatForever::create(leaf2_sequence));
-        //½«×óÒ¶×Ó¼ÓÈë³¡¾°ÖÐ
+        //å°†å·¦å¶å­åŠ å…¥åœºæ™¯ä¸­
         this->addChild(leaf2);
 
 
     }
 
-    //·ÅÖÃÖÐ¼äµÄÒ¶×Ó
+    //æ”¾ç½®ä¸­é—´çš„å¶å­
     auto leaf3 = Sprite::create("/MenuScene/leaf3.png");
-    if (leaf3 == nullptr)   //ÕÒ²»µ½¸ÃÍ¼Æ¬
+    if (leaf3 == nullptr)   //æ‰¾ä¸åˆ°è¯¥å›¾ç‰‡
     {
         problemLoading("leaf3.png'");
     }
     else
     {
         auto leaf3size = leaf3->getContentSize();
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         leaf3->setPosition(Vec2(origin.x + visibleSize.width / 2 + 10, origin.y - leaf3size.height / 2 + visibleSize.height / 2 + 160));
 
 
         leaf3->setAnchorPoint(Vec2(0.5, 0));
-        //´Ó×óÏòÓÒÆ®µ½½çÃæÍâ
+        //ä»Žå·¦å‘å³é£˜åˆ°ç•Œé¢å¤–
         auto leaf3_move1 = RotateTo::create(rabbit_leaf_hang_time, -rabbit_leaf_hang_range);
-        //»Øµ½Ô­À´Î»ÖÃ
+        //å›žåˆ°åŽŸæ¥ä½ç½®
         auto leaf3_move2 = RotateTo::create(rabbit_leaf_hang_time, rabbit_leaf_hang_range);
-        //»Øµ½Ô­À´Î»ÖÃ
+        //å›žåˆ°åŽŸæ¥ä½ç½®
         auto leaf3_move3 = RotateTo::create(rabbit_leaf_hang_time, 0);
-        //¶¯×÷ÐòÁÐ£¬ÏÈ´Ó×óµ½ÓÒ£¬ÔÝÍ£3s£¬»Øµ½Ô­À´Î»ÖÃ
+        //åŠ¨ä½œåºåˆ—ï¼Œå…ˆä»Žå·¦åˆ°å³ï¼Œæš‚åœ3sï¼Œå›žåˆ°åŽŸæ¥ä½ç½®
         auto leaf3_sequence = Sequence::create(leaf3_move1, leaf3_move2, leaf3_move3, DelayTime::create(3), nullptr);
 
-        //ÎÞÏÞÑ­»·Ð¡ÔÆ¶ä¶¯×÷ÐòÁÐ
+        //æ— é™å¾ªçŽ¯å°äº‘æœµåŠ¨ä½œåºåˆ—
         leaf3->runAction(RepeatForever::create(leaf3_sequence));
-        //½«×óÒ¶×Ó¼ÓÈë³¡¾°ÖÐ
+        //å°†å·¦å¶å­åŠ å…¥åœºæ™¯ä¸­
         this->addChild(leaf3);
 
 
     }
 
-    //·ÅÖÃÂÜ²·
+    //æ”¾ç½®èåœ
     auto carrot = Sprite::create("/MenuScene/carrot.png");
-    if (smallcloud == nullptr)   //ÕÒ²»µ½¸ÃÍ¼Æ¬
+    if (smallcloud == nullptr)   //æ‰¾ä¸åˆ°è¯¥å›¾ç‰‡
     {
         problemLoading("'carrot.png'");
     }
     else
     {
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         carrot->setPosition(Vec2(origin.x + visibleSize.width / 2 + 10, origin.y + visibleSize.height / 2 + 40));
 
-        //½«ÂÜ²·¼ÓÈë³¡¾°ÖÐ
+        //å°†èåœåŠ å…¥åœºæ™¯ä¸­
         this->addChild(carrot);
     }
 
-    //·ÅÖÃ±êÌâ
+    //æ”¾ç½®æ ‡é¢˜
     auto title = Sprite::create("/MenuScene/title.png");
-    if (title == nullptr)   //ÕÒ²»µ½¸ÃÍ¼Æ¬
+    if (title == nullptr)   //æ‰¾ä¸åˆ°è¯¥å›¾ç‰‡
     {
         problemLoading("'title.png'");
     }
     else
     {
-        //ÉèÖÃ±ÈÀý
+        //è®¾ç½®æ¯”ä¾‹
         bigcloud->setScale(0.9);
 
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         title->setPosition(Vec2(origin.x + visibleSize.width / 2+35, origin.y + visibleSize.height / 2-40));
 
-        //½«±êÌâ¼ÓÈë³¡¾°ÖÐ
+        //å°†æ ‡é¢˜åŠ å…¥åœºæ™¯ä¸­
         this->addChild(title);
     }
   
-    //·ÅÖÃ¹ÖÎï
+    //æ”¾ç½®æ€ªç‰©
     auto monster = Sprite::create("/MenuScene/monster.png");
-    if (monster == nullptr)   //ÕÒ²»µ½¸ÃÍ¼Æ¬
+    if (monster == nullptr)   //æ‰¾ä¸åˆ°è¯¥å›¾ç‰‡
     {
         problemLoading("'monster.png'");
     }
     else
     {
-        //ÉèÖÃ±ÈÀý
+        //è®¾ç½®æ¯”ä¾‹
         monster->setScale(0.9);
 
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         monster->setPosition(Vec2(origin.x + visibleSize.width / 5, origin.y + visibleSize.height*0.8));
 
-        //´ÓÉÏµ½ÏÂ
+        //ä»Žä¸Šåˆ°ä¸‹
         auto monster_move1 = MoveTo::create(1.25, Vec2(monster->getPositionX(), monster->getPositionY() - 25));
 
-        //´ÓÏÂµ½ÉÏ
+        //ä»Žä¸‹åˆ°ä¸Š
         auto monster_move2 = MoveTo::create(1.25, Vec2(monster->getPositionX(), monster->getPositionY() + 25));
 
-        //¶¯×÷ÐòÁÐ£¬ÏÈ´Ó×óµ½ÓÒ£¬ÔÝÍ£0s£¬»Øµ½Ô­À´Î»ÖÃ
+        //åŠ¨ä½œåºåˆ—ï¼Œå…ˆä»Žå·¦åˆ°å³ï¼Œæš‚åœ0sï¼Œå›žåˆ°åŽŸæ¥ä½ç½®
         auto monster_sequence = Sequence::create(monster_move1, DelayTime::create(0), monster_move2, nullptr);
 
-        //ÎÞÏÞÑ­»·¹ÖÎï¶¯×÷ÐòÁÐ
+        //æ— é™å¾ªçŽ¯æ€ªç‰©åŠ¨ä½œåºåˆ—
         monster->runAction(RepeatForever::create(monster_sequence));
         
-        //½«¹ÖÎï¼ÓÈë³¡¾°ÖÐ
+        //å°†æ€ªç‰©åŠ å…¥åœºæ™¯ä¸­
         this->addChild(monster);
     }
 
 
-    //´´½¨²Ëµ¥
+    //åˆ›å»ºèœå•
     auto menu = Menu::create();
     menu->setPosition(Vec2::ZERO);
  
 
-    //Ã°ÏÕÄ£Ê½
+    //å†’é™©æ¨¡å¼
     auto AdventureModel_Item = MenuItemImage::create("/MenuScene/AdventureModel.png", "/MenuScene/AdventureModelSelected.png", CC_CALLBACK_1(MenuScene::goto_adventure, this));
 
     if (AdventureModel_Item == nullptr    || AdventureModel_Item->getContentSize().width <= 0 ||AdventureModel_Item->getContentSize().height <= 0) {
         problemLoading("'AdventureModel.png'and 'AdventureModelSelected.png'");
     }
     else {
-        //ÉèÖÃ±ÈÀý
+        //è®¾ç½®æ¯”ä¾‹
         AdventureModel_Item->setScale(0.9);
 
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         AdventureModel_Item->setPosition(Vec2(origin.x + visibleSize.width / 5, origin.y + visibleSize.height / 8));
 
-        //½«Ã°ÏÕÄ£Ê½¼ÓÈë²Ëµ¥ÖÐ
+        //å°†å†’é™©æ¨¡å¼åŠ å…¥èœå•ä¸­
         menu->addChild(AdventureModel_Item);
     }
 
 
-    //BOSSÄ£Ê½°´¼ü
-    auto BossModel_Item = MenuItemImage::create("/MenuScene/BossModel.png", "/MenuScene/BossModelSelected.png", CC_CALLBACK_1(MenuScene::CloseCallback, this));
+    //BOSSæ¨¡å¼æŒ‰é”®
+    auto BossModel_Item = MenuItemImage::create("/MenuScene/BossModel.png", "/MenuScene/BossModelSelected.png", CC_CALLBACK_1(MenuScene::preparing, this));
 
     if (BossModel_Item == nullptr || BossModel_Item->getContentSize().width <= 0 || BossModel_Item->getContentSize().height <= 0) {
         problemLoading("'BosseModel.png' and 'BosseModelSelected.png'");
     }
     else {
-        //ÉèÖÃ±ÈÀý
+        //è®¾ç½®æ¯”ä¾‹
         BossModel_Item->setScale(0.9);
 
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         BossModel_Item->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 8));
 
-        //½«BOSSÄ£Ê½¼ÓÈë²Ëµ¥ÖÐ
+        //å°†BOSSæ¨¡å¼åŠ å…¥èœå•ä¸­
         menu->addChild(BossModel_Item);
     }
 
-    //¹ÖÎïÎÑ°´¼ü
-    auto MonsterNest_Item = MenuItemImage::create("/MenuScene/MonsterNest.png", "/MenuScene/MonsterNestSelected.png", CC_CALLBACK_1(MenuScene::CloseCallback, this));
+    //æ€ªç‰©çªæŒ‰é”®
+    auto MonsterNest_Item = MenuItemImage::create("/MenuScene/MonsterNest.png", "/MenuScene/MonsterNestSelected.png", CC_CALLBACK_1(MenuScene::preparing, this));
 
     if (MonsterNest_Item == nullptr || MonsterNest_Item->getContentSize().width <= 0 || MonsterNest_Item->getContentSize().height <= 0) {
         problemLoading("'MonsterNest.png' and 'MonsterNestSelected.png'");
     }
     else {
-        //ÉèÖÃ±ÈÀý
+        //è®¾ç½®æ¯”ä¾‹
         MonsterNest_Item->setScale(0.9);
 
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         MonsterNest_Item->setPosition(Vec2(origin.x + visibleSize.width / 5 * 4, origin.y + visibleSize.height / 8));
 
-        //½«¹ÖÎïÎÑ¼ÓÈë²Ëµ¥ÖÐ
+        //å°†æ€ªç‰©çªåŠ å…¥èœå•ä¸­
         menu->addChild(MonsterNest_Item);
     }
 
-    //ÉèÖÃ°´¼ü
-    auto Set_Item = MenuItemImage::create("/MenuScene/Set.png", "/MenuScene/SetSelected.png", CC_CALLBACK_1(MenuScene::goto_helper, this));
+    //è®¾ç½®æŒ‰é”®
+    auto Set_Item = MenuItemImage::create("/MenuScene/Set.png", "/MenuScene/SetSelected.png", CC_CALLBACK_1(MenuScene::goto_setting, this));
     if (Set_Item == nullptr) {
         problemLoading("'Set.png' and 'SetSelected.png'");
     }
     else {
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         Set_Item->setPosition(Vec2(origin.x + visibleSize.width / 5, origin.y + visibleSize.height / 3));
 
-        //½«ÉèÖÃ°´¼ü¼ÓÈë²Ëµ¥ÖÐ
+        //å°†è®¾ç½®æŒ‰é”®åŠ å…¥èœå•ä¸­
         menu->addChild(Set_Item);
     }
 
-    //°ïÖú°´¼ü
-    auto Help_Item = MenuItemImage::create("/MenuScene/Help.png", "/MenuScene/HelpSelected.png", CC_CALLBACK_1(MenuScene::CloseCallback, this));
+    //å¸®åŠ©æŒ‰é”®
+    auto Help_Item = MenuItemImage::create("/MenuScene/Help.png", "/MenuScene/HelpSelected.png", CC_CALLBACK_1(MenuScene::goto_helper, this));
     if (Help_Item == nullptr) {
         problemLoading("'Help.png' and 'HelpSelected.png'");
     }
     else {
-        //·ÅÖÃÍ¼Æ¬
+        //æ”¾ç½®å›¾ç‰‡
         Help_Item->setPosition(Vec2(origin.x + visibleSize.width / 5 * 4 , origin.y + visibleSize.height / 3));
 
-        //½«°ïÖú°´¼ü¼ÓÈë²Ëµ¥
+        //å°†å¸®åŠ©æŒ‰é”®åŠ å…¥èœå•
         menu->addChild(Help_Item);
     }
 
-    //½«²Ëµ¥°´¼ü¼ÓÈë³¡¾°ÖÐ
+    //å°†èœå•æŒ‰é”®åŠ å…¥åœºæ™¯ä¸­
     this->addChild(menu);
 
     return true;
@@ -360,14 +362,47 @@ bool MenuScene::init()
 
 void  MenuScene::goto_adventure(Ref* psender) 
 {
-    //´´½¨Ã°ÏÕÄ£Ê½Ñ¡¹Ø³¡¾°
+    //åˆ›å»ºå†’é™©æ¨¡å¼é€‰å…³åœºæ™¯
     auto MapChoose = MapChooseScene::createScene();
-
-    //µ­³ö£¬ÇÐ»»³¡¾°
+    if (hit_sound_open)
+        hit_sound->playEffect("/music/hit_sound.mp3", false, 1.0f, 1.0f, 1.0f);
+    //æ·¡å‡ºï¼Œåˆ‡æ¢åœºæ™¯
     Director::getInstance()->replaceScene(TransitionFade::create(1.0f, MapChoose));
 }
 
+void  MenuScene::goto_setting(Ref* psender)
+{
+    
+    auto Setting = Setting::createScene();
+    //bgm->stopBackgroundMusic();
+    if (hit_sound_open)
+        hit_sound->playEffect("/music/hit_sound.mp3", false, 1.0f, 1.0f, 1.0f);
+    Director::getInstance()->replaceScene(TransitionFade::create(0.5, Setting));
+}
+void MenuScene::goto_helper(Ref* psender)
+{
+    auto Helper = Helper::createScene();
+    //bgm->stopBackgroundMusic();
+    if (hit_sound_open)
+        hit_sound->playEffect("/music/hit_sound.mp3", false, 1.0f, 1.0f, 1.0f);
+    Director::getInstance()->replaceScene(TransitionFade::create(0.5, Helper));
+}
+void MenuScene::preparing(Ref* pSender) {
 
+    auto visibleSize = Director::getInstance()->getVisibleSize();  //èŽ·å–åˆ†è¾¨çŽ‡ï¼ˆçª—å£å¤§å°ï¼‰
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    auto CountDown_layer = Layer::create();
+    CountDown_layer->setPosition(Vec2::ZERO);
+    
+    auto word = Label::createWithTTF("UNFINISHED", "fonts/Marker Felt.ttf", 50);
+    word->setColor(Color3B::WHITE);
+    word->enableOutline(Color4B::BLACK, 1);
+    word->setPosition(Vec2(visibleSize.width / 2+ origin.x,visibleSize.height / 2 + origin.y));
+    CountDown_layer->addChild(word);
+    CountDown_layer->runAction(Sequence::create(DelayTime::create(1), MoveBy::create(1, Vec2(0, 500)), nullptr));
+    this->addChild(CountDown_layer);
+}
 
 void MenuScene::CloseCallback(Ref* pSender)
 {
@@ -382,11 +417,4 @@ void MenuScene::CloseCallback(Ref* pSender)
 
 }
 
-void  MenuScene::goto_helper(Ref* psender)
-{
-    //´´½¨Ã°ÏÕÄ£Ê½Ñ¡¹Ø³¡¾°
-    auto Setting = Setting::createScene();
 
-    //µ­³ö£¬ÇÐ»»³¡¾°
-    Director::getInstance()->replaceScene(TransitionFade::create(0.5, Setting));
-}

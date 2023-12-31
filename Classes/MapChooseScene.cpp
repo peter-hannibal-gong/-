@@ -1,6 +1,9 @@
 #include "MapChooseScene.h"
 #include "MenuScene.h"
 #include"LevelSelectionScene.h"
+#include"Setting.h"
+#include "helper.h"
+#include "music.h"
 USING_NS_CC;
 
 /*创建场景*/
@@ -55,6 +58,8 @@ bool MapChooseScene::init()
     BackHome_Item->setCallback([this](Ref* psender) {//回调函数
        
         auto menu_scene = MenuScene::createScene();//创建主菜单对应Scene
+        if (hit_sound_open)
+            hit_sound->playEffect("/music/hit_sound.mp3", false, 1.0f, 1.0f, 1.0f);
         Director::getInstance()->replaceScene(TransitionFade::create(1.0f, menu_scene));//切换到MenuScene
         });
     BackHome_Item->setPosition(Vec2(origin.x + visibleSize.width * 0.05,origin.y + visibleSize.height * 0.95));
@@ -63,9 +68,10 @@ bool MapChooseScene::init()
     //帮助按钮
     auto Helper_Item = MenuItemImage::create("/MapChooseScene/Helper.png", "/MapChooseScene/HelperSelected.png");
     Helper_Item->setCallback([this](Ref* psender) {//回调函数
-
-        auto menu_scene = MenuScene::createScene();//创建主菜单对应Scene
-        Director::getInstance()->replaceScene(TransitionFade::create(1.0f, menu_scene));//切换到MenuScene
+        auto Helper = Helper::createScene();
+        if (hit_sound_open)
+            hit_sound->playEffect("/music/hit_sound.mp3", false, 1.0f, 1.0f, 1.0f);
+        Director::getInstance()->replaceScene(TransitionFade::create(1.0f, Helper));//切换到MenuScene
         });
     Helper_Item->setPosition(Vec2(origin.x + visibleSize.width * 0.95, origin.y + visibleSize.height * 0.95));
     menu->addChild(Helper_Item);
@@ -110,9 +116,21 @@ bool MapChooseScene::init()
     /*-----------第二张map---------*/
     auto Map2_Item = MenuItemImage::create("/MapChooseScene/map2.png", "/MapChooseScene/map2.png");
     Map2_Item->setCallback([this](Ref* psender) {//回调函数
-        ;
-        //auto menu_scene = MenuScene::createScene();//创建主菜单对应Scene
-        //Director::getInstance()->replaceScene(TransitionFade::create(1.0f, menu_scene));//切换到MenuScene
+        auto visibleSize = Director::getInstance()->getVisibleSize();  //获取分辨率（窗口大小）
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    auto CountDown_layer = Layer::create();
+    CountDown_layer->setPosition(Vec2::ZERO);
+
+    auto word = Label::createWithTTF("UNFINISHED", "fonts/Marker Felt.ttf", 50);
+    word->setColor(Color3B::WHITE);
+    word->enableOutline(Color4B::BLACK, 1);
+    word->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+    CountDown_layer->addChild(word);
+    CountDown_layer->runAction(Sequence::create(DelayTime::create(1), MoveBy::create(1, Vec2(0, 500)), nullptr));
+    this->addChild(CountDown_layer);
+    //auto menu_scene = MenuScene::createScene();//创建主菜单对应Scene
+    //Director::getInstance()->replaceScene(TransitionFade::create(1.0f, menu_scene));//切换到MenuScene
         });
 
     if (Map2_Item == nullptr || Map2_Item->getContentSize().width <= 0 || Map2_Item->getContentSize().height <= 0) {
@@ -130,7 +148,19 @@ bool MapChooseScene::init()
     /*-----------第三张map---------*/
     auto Map3_Item = MenuItemImage::create("/MapChooseScene/map3.png", "/MapChooseScene/map3.png");
     Map3_Item->setCallback([this](Ref* psender) {//回调函数
-        ;
+        auto visibleSize = Director::getInstance()->getVisibleSize();  //获取分辨率（窗口大小）
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    auto CountDown_layer = Layer::create();
+    CountDown_layer->setPosition(Vec2::ZERO);
+
+    auto word = Label::createWithTTF("UNFINISHED", "fonts/Marker Felt.ttf", 50);
+    word->setColor(Color3B::WHITE);
+    word->enableOutline(Color4B::BLACK, 1);
+    word->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+    CountDown_layer->addChild(word);
+    CountDown_layer->runAction(Sequence::create(DelayTime::create(1), MoveBy::create(1, Vec2(0, 500)), nullptr));
+    this->addChild(CountDown_layer);;
         // auto menu_scene = MenuScene::createScene();//创建主菜单对应Scene
         //Director::getInstance()->replaceScene(TransitionFade::create(1.0f, menu_scene));//切换到MenuScene
         });
@@ -175,6 +205,13 @@ bool MapChooseScene::init()
 
 }
 
+void MapChooseScene::goto_helper(cocos2d::Ref* pSender) {
+    auto Helper = Helper::createScene();
+    //bgm->stopBackgroundMusic();
+    if (hit_sound_open)
+        hit_sound->playEffect("/music/hit_sound.mp3", false, 1.0f, 1.0f, 1.0f);
+    Director::getInstance()->replaceScene(TransitionFade::create(0.5, Helper));
+}
 void MapChooseScene::CloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application

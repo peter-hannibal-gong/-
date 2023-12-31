@@ -22,14 +22,14 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#ifndef __HELPER_SCENE_H__
-#define __HELPER_SCENE_H__
+#ifndef __HELPERA_SCENE_H__
+#define __HELPERA_SCENE_H__
 
 #include "cocos2d.h"
 
 
 
-class Helper : public cocos2d::Scene
+class Helpera : public cocos2d::Scene
 {
 private:
     int Chapter = 0; //保存当前在几页
@@ -41,16 +41,16 @@ public:
     //初始化函数声明
     virtual bool init();
 
-    void  Helper::goto_helper1(Ref* pSender);
-    void Helper::goto_helper2(Ref* pSender);
+    void  Helpera::goto_helper(Ref* pSender);
+    void Helpera::goto_helper2(Ref* pSender);
     //回调函数声明
     void CloseCallback(cocos2d::Ref* pSender);
 
     //创建Scene1对象的宏定义
-    CREATE_FUNC(Helper);
+    CREATE_FUNC(Helpera);
 
 };
 
 
-#endif // __HELPER_H__
+#endif // __HELPERA_H__
 

@@ -160,7 +160,19 @@ void LevelSelectionScene::Create_Layer1()
     //第三关
     auto Level3_Item = MenuItemImage::create("/LevelSelectionScene/Level3.png", "/LevelSelectionScene/Level3.png");
     Level3_Item->setCallback([this](Ref* psender) {//回调函数
+        auto visibleSize = Director::getInstance()->getVisibleSize();  //获取分辨率（窗口大小）
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    auto CountDown_layer = Layer::create();
+    CountDown_layer->setPosition(Vec2::ZERO);
+
+    auto word = Label::createWithTTF("UNFINISHED", "fonts/Marker Felt.ttf", 50);
+    word->setColor(Color3B::WHITE);
+    word->enableOutline(Color4B::BLACK, 1);
+    word->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+    CountDown_layer->addChild(word);
+    CountDown_layer->runAction(Sequence::create(DelayTime::create(1), MoveBy::create(1, Vec2(0, 500)), nullptr));
+    this->addChild(CountDown_layer);
         //auto Level3 = Scene3::createScene();//创建第三关对应Scene
         //Director::getInstance()->replaceScene(TransitionFade::create(1.0f, Level3));//切换到Scene3
         });
