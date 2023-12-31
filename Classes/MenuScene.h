@@ -16,17 +16,14 @@ public:
 
     void close_game(Ref* pSender); //关闭游戏
 
-    void goto_options(Ref* pSender);   //去设置界面
+    void goto_setting(Ref* pSender);   //去设置界面
 
     void goto_helper(Ref* pSender);  //去帮助界面
 
     void goto_adventure(Ref* psender);  //去冒险模式
 
-    void goto_boss(Ref* psender);  //去boss模式
-
-    void goto_nest(Ref* psender);    //去怪物窝
-
-
+    void preparing(Ref* psender);  //去boss模式//去怪物窝
+   
     void CloseCallback(cocos2d::Ref* pSender);
 };
 

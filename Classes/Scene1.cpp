@@ -290,7 +290,7 @@ bool Scene1::init()
 
 
 
-    //Game_Start();
+    Game_Start();
 
   
 

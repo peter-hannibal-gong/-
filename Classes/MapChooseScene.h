@@ -16,7 +16,8 @@ public:
 
     //初始化函数声明
     virtual bool init();
-
+    
+    void goto_helper(cocos2d::Ref* pSender);
     //回调函数声明
     void CloseCallback(cocos2d::Ref* pSender);
 
