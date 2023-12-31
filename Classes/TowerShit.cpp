@@ -31,7 +31,7 @@ bool TowerShit::init()
     
 
     //每0.2s更新一次攻击目标
-    schedule(CC_SCHEDULE_SELECTOR(TowerShit::checkAtkTarget),1.0f);
+    schedule(CC_SCHEDULE_SELECTOR(TowerShit::checkAtkTarget),0.2f);
 
     //如果目标存在，每0.4秒攻击一次
     schedule(CC_SCHEDULE_SELECTOR(TowerShit::AttackTarget), 1.0f);
@@ -133,11 +133,11 @@ void TowerShit::Hide_RangeAndGrade(Node* node)
     node->removeChild(SellTower);
 
     //显示升级所需money取消
-    if (level != 2) { //没有达到最高级(达到最高级原本就没有显示升级所需money)
+  
         Node* n4 = node->getChildByTag(9000 + 100 * i + j);
         Label* UpLevel_Money = static_cast<Label*>(n4);
         node->removeChild(UpLevel_Money);
-    }
+    
     //显示出售money
     Node* n5 = node->getChildByTag(10000 + 100 * i + j);
     Label* SellTower_Money = static_cast<Label*>(n5);
@@ -161,7 +161,6 @@ void TowerShit::Upgrade(Node* node)
 void TowerShit::checkAtkTarget(float dt)
 {
    
-
     //获取范围
     auto Range = Sprite::create("/Theme/Tower/AttackRange.png");
     Range->setScale(level * 0.5 + 1);

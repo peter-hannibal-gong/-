@@ -139,6 +139,8 @@ public:
 
     //每0.2秒监测一次是否有怪物到达终点，吃到萝卜
     void If_Attack_Carrot(float dt);
+
+    void goto_LevelSelection();
 };
 
 

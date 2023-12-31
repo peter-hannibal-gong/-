@@ -11,15 +11,15 @@ Sprite* Carrot::createSprite()
     return Carrot::create();
 }
 
-
+/*初始化*/
 bool Carrot::init()
 {
     if (!Sprite::init()) {
         return false;
     }
 
-    this->initWithFile("carrot.png");
-    this->setScale(1.5);
+    this->initWithFile("Carrot/Carrot10.png");
+    this->setScale(1);
     //创建生命值血条
     auto HpBarBG = Sprite::create("/Monster/BloodBarBg.png");
     HpBarBG->setPosition(Vec2(getContentSize().width / 2 +5, getContentSize().height / 2 + 35));
@@ -43,18 +43,67 @@ bool Carrot::init()
     return true;
 }
 
+/*通过计算到达终点的怪物个数设置血量*/
+bool Carrot::SetHp(int damage)
+{
+    if (damage >= 10)
+        Hp = 0;
+    else
+        Hp = Hp - damage;
 
-/*实时更新血量值*/
+    if (Hp == 0)
+        return true;
+    else
+        return false;
+}
+
+
+/*实时更新血量值和萝卜形象*/
 void Carrot::updateHp(float dt)
 {
 
-    Hp = Hp - 1;
+    //Hp = Hp - 1;
     if (Hp <= 0) {
         unschedule(CC_SCHEDULE_SELECTOR(Carrot::update));
         //this->setVisible(false);
         //removeFromParent();//让怪消失
     }
     BloodBar->setPercentage(float(Hp*10));
+
+    switch (Hp) {
+        case (10):
+            this->setTexture("/Carrot/Carrot10.png");
+            break;
+        case (9):
+            this->setTexture("/Carrot/Carrot9.png");
+            break;
+        case (8):
+            this->setTexture("/Carrot/Carrot7-8.png");
+            break;
+        case (7):
+            this->setTexture("/Carrot/Carrot7-8.png");
+            break;
+        case (6):
+            this->setTexture("/Carrot/Carrot5-6.png");
+            break;
+        case (5):
+            this->setTexture("/Carrot/Carrot5-6.png");
+            break;
+        case (4):
+            this->setTexture("/Carrot/Carrot4.png");
+            break;
+        case (3):
+            this->setTexture("/Carrot/Carrot3.png");
+            break;
+        case (2):
+            this->setTexture("/Carrot/Carrot2.png");
+            break;
+        case (1):
+            this->setTexture("/Carrot/Carrot1.png");
+            break;
+
+    }
+   
 }
 
 

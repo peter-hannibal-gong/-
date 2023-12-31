@@ -4,7 +4,7 @@
 #include<vector>
 extern std::vector <FlyMonster*> m;  //用于存放怪物
 extern Scene* se;
-static FlyMonster* target=nullptr;
+static FlyMonster* target1=nullptr;
 
 using namespace std;
 Sprite* TowerBottle::createSprite()
@@ -19,7 +19,7 @@ bool TowerBottle::init()
         return false;
     }
 
-    target = nullptr;  //攻击的目标，初始为nullptr
+    target1 = nullptr;  //攻击的目标，初始为nullptr
     //Scene* scene = se;
 
    
@@ -30,10 +30,10 @@ bool TowerBottle::init()
     
 
     //每0.2s更新一次攻击目标
-    schedule(CC_SCHEDULE_SELECTOR(TowerBottle::checkAtkTarget),1.0f);
+    schedule(CC_SCHEDULE_SELECTOR(TowerBottle::checkAtkTarget),0.2f);
 
     //如果目标存在，每0.4秒攻击一次
-    schedule(CC_SCHEDULE_SELECTOR(TowerBottle::AttackTarget), 1.0f);
+    schedule(CC_SCHEDULE_SELECTOR(TowerBottle::AttackTarget), 0.8f);
    
     return true;
 }
@@ -79,28 +79,28 @@ void TowerBottle::Show_RangeAndGrade(Node* node,int money)
         auto UpLevel = Sprite::create("/Theme/Tower/ReachHighestLevel.png");
         UpLevel->setPosition(Vec2(j * 80 + 40, (6 - i) * 80 + 120));
         node->addChild(UpLevel, 2);
-        UpLevel->setTag(14000 + 100 * i + j);
+        UpLevel->setTag(13000 + 100 * i + j);
     }
 
     //出售显示
     auto SellTower = Sprite::create("/Theme/Tower/SellTower.png");
     SellTower->setPosition(Vec2(j * 80 + 40, (6 - i) * 80 -40));
     node->addChild(SellTower, 2);
-    SellTower->setTag(15000 + 100 * i + j);
+    SellTower->setTag(14000 + 100 * i + j);
 
     //显示升级所需money
     if (level != 2) { //没有达到最高级
         auto UpLevel_Money = Label::createWithTTF(std::to_string(upgradecost[level + 1]), "fonts/Marker Felt.ttf", 20);
         UpLevel_Money->setPosition(Vec2(j * 80 + 50, (6 - i) * 80 + 95));
         node->addChild(UpLevel_Money, 2);
-        UpLevel_Money->setTag(16000 + 100 * i + j);
+        UpLevel_Money->setTag(15000 + 100 * i + j);
     }
     
     //显示出售money
     auto SellTower_Money = Label::createWithTTF(std::to_string(value[level]), "fonts/Marker Felt.ttf", 20);
     SellTower_Money->setPosition(Vec2(j * 80 + 50, (6 - i) * 80 - 65));
     node->addChild(SellTower_Money, 2);
-    SellTower_Money->setTag(17000 + 100 * i + j);
+    SellTower_Money->setTag(16000 + 100 * i + j);
 
 }
 
@@ -133,11 +133,11 @@ void TowerBottle::Hide_RangeAndGrade(Node* node)
     node->removeChild(SellTower);
 
     //显示升级所需money取消
-    if (level != 2) { //没有达到最高级(达到最高级原本就没有显示升级所需money)
+   
         Node* n4 = node->getChildByTag(15000 + 100 * i + j);
         Label* UpLevel_Money = static_cast<Label*>(n4);
         node->removeChild(UpLevel_Money);
-    }
+    
     //显示出售money
     Node* n5 = node->getChildByTag(16000 + 100 * i + j);
     Label* SellTower_Money = static_cast<Label*>(n5);
@@ -163,30 +163,30 @@ void TowerBottle::checkAtkTarget(float dt)
    
     //获取范围
     auto Range = Sprite::create("/Theme/Tower/AttackRange.png");
-    Range->setScale(level * 0.5 + 1.2);
+    Range->setScale(level * 0.5 + 1);
     //Node* n1 = se->getChildByTag(6000 + 100 * i + j);
     //Sprite* Range = static_cast<Sprite*>(n1);
 
 
     //对于当前选择的目标，要判断他是否在范围内
-    if (target!=nullptr)
-        if (target->survival == 1) {
+    if (target1!=nullptr)
+        if (target1->survival == 1) {
             float x = this->getPosition().x;
             float y = this->getPosition().y;
 
-            float x1 = target->getPosition().x;
-            float y1 = target->getPosition().y;
+            float x1 = target1->getPosition().x;
+            float y1 = target1->getPosition().y;
 
             float d = sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
 
             //如果当前目标出了范围
             if (d > Range->getContentSize().height / 2) {
-                target = nullptr;
+                target1 = nullptr;
             }        
         }
 
     //如果当前没有目标，在怪兽序列中寻找目标
-    if (target == nullptr) {
+    if (target1 == nullptr) {
         for (int i = 0; i < m.size(); i++) 
             if (m[i]->survival==1) {  //如果这个怪物存活
 
@@ -204,13 +204,14 @@ void TowerBottle::checkAtkTarget(float dt)
 
                 //如果在范围内，则将其设置为目标
                 if (d <= Range->getContentSize().height / 2) {
-                    target = monster;
+                    target1 = monster;
                     return;
                 }
             }
     }
 
 }
+
 /*瓶子塔的攻击特效*/
 void TowerBottle::attack(Node* node, cocos2d::Vec2 start, cocos2d::Vec2 end)
 {
@@ -267,6 +268,8 @@ void TowerBottle::attack(Node* node, cocos2d::Vec2 start, cocos2d::Vec2 end)
 
     }
     atk_Effect->setRotation(r);
+    
+    //atk_Effect->setAnchorPoint(Vec2(j * 80 + 40, (6 - i) * 80 + 40));
     atk_Effect->runAction(Sequence::create(DelayTime::create(0.1f),hide,Animate::create(Animation::createWithSpriteFrames(frame, 0.25)),unhide, remove_atk_Effect, nullptr));
    
 
@@ -325,11 +328,12 @@ void TowerBottle::AttackTarget(float dt)
     auto node2 = this->getChildByName("Scene");
 
     //如果目标存在，则对其进行攻击
-    if (target != nullptr) {
-        if (target->getHp() > ATK[level])
-            target->takedamage(ATK[level]);
+    if (target1 != nullptr) {
+        if (target1->getHp() > ATK[level])
+            target1->takedamage(ATK[level]);
         else
-            target->takedamage(target->getHp());
-        attack(se,this->getPosition(),target->getPosition());
+            target1->takedamage(target1->getHp());
+        //攻击动画
+        attack(se,this->getPosition(),target1->getPosition());
     }
 }

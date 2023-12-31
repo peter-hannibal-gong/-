@@ -20,6 +20,6 @@ public:
 
 	void updateHp(float dt);  //更新血量
 
-	void Set_DelayTime(float delaytime);
+	bool SetHp(int damage);   //设置血量
 };
 #endif /* defined(__CarrotFantasy__Carrot__) */

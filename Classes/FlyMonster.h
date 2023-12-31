@@ -9,6 +9,7 @@ class FlyMonster : public cocos2d::Sprite
 {
 public:
 
+	int Origin_Hp;
 	int speed = 70;
 	int Hp=70;
 	int ATK = 1;  //¹ÖÎïµÄ¹¥»÷Öµ

@@ -8,7 +8,7 @@
 #include"MonsterFactory.h"
 #include"carrot.h"
 #include<vector>
-
+#include"LevelSelectionScene.h"
 
 //暂时存储要进行操作的位置
 int gchx = -1;
@@ -293,7 +293,7 @@ bool Scene1::init()
 
 
 
-    Game_Start();
+    //Game_Start();
 
   
 
@@ -305,9 +305,10 @@ bool Scene1::init()
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
     
    
-    auto Carrot = Carrot::createSprite();
-    Carrot->setPosition(Vec2(80*11-40,80*6));
-    this->addChild(Carrot);
+    auto carrot = Carrot::createSprite();
+    carrot->setTag(-10);
+    carrot->setPosition(Vec2(80*11-40,80*6));
+    this->addChild(carrot);
     //auto flymonster = FlyMonster::createSprite();
     //this->addChild(flymonster, 2);
 
@@ -326,12 +327,15 @@ bool Scene1::init()
     //每1秒出现一只怪物 
     schedule(CC_SCHEDULE_SELECTOR(Scene1::updateMonster), 1.0f);
     
+    //监测活着的怪物
+    schedule(CC_SCHEDULE_SELECTOR(Scene1::AliveMonster), 0.2f);
+
     //监测是否有怪物到达萝卜处吃掉萝卜
     schedule(CC_SCHEDULE_SELECTOR(Scene1::If_Attack_Carrot), 0.2f);
 
-    //监测活着的怪物
-    schedule(CC_SCHEDULE_SELECTOR(Scene1::AliveMonster), 0.2f);
    
+
+
     
     return true;
 }
@@ -405,8 +409,36 @@ void Scene1::updateMonster(float dt)
 //监测是否有怪物到达终点，吃到萝卜
 void Scene1::If_Attack_Carrot(float dt)
 {
-    
 
+    int count = 0;
+    Node* n = this->getChildByTag(-10);
+    Carrot* carrot = static_cast<Carrot*>(n);
+   
+    for (int i = 0; i < m.size(); i++) 
+        if (m[i]->getHp() > 0) { //活着        
+            int x = m[i]->getPosition().x;
+            int y = m[i]->getPosition().y;
+
+            if (x >= 10 * 80 && x <= 10 * 80 + 80 && y >= 5 * 80 && y <= 5 * 80 + 80) //如果在终点
+                count++;
+
+        }
+    //
+    int f=carrot->SetHp(count);
+    if (f) {  //如果萝卜血量为0，跳转
+        goto_LevelSelection();
+    }
+        
+}
+
+/*跳转到关卡选择界面*/
+void  Scene1::goto_LevelSelection()
+{
+    //创建冒险模式选关场景
+    auto LevelSelection = LevelSelectionScene::createScene();
+
+    //淡出，切换场景
+    Director::getInstance()->replaceScene(TransitionFade::create(0.5, LevelSelection));
 }
 
 //实时更新怪物是否死亡
@@ -420,6 +452,7 @@ void Scene1::AliveMonster(float dt)
     
 }
 
+/*鼠标事件*/
 void Scene1::gch_onMouseDown(Event* event)
 {
 
